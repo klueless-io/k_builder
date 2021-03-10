@@ -2,6 +2,29 @@
 
 > K Builder provides various fluent builders for initializing applications with different language requirements
 
+## ToDo
+
+- BuildWatcher (as a builder)
+- AppBuilder
+- BaseBuilder
+- WebBuilder
+  - PackageBuilder
+  - Webpack5Builder
+  - ReactBuilder
+  - SlideDeckBuilder
+  - JavscriptBuilder
+- SolutionBuilder
+- DotnetBuilder
+  - C#Console
+  - C#Mvc
+- RubyBuilder
+  - RubyGem
+  - RailsApp
+- PythonBuilder
+- DddBuilder
+  - DddGenerator
+
+
 ## Installation
 
 Add this line to your application's Gemfile:
