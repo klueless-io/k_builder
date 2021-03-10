@@ -8,25 +8,20 @@ As a Polyglot Developer, I want to be up and running in any development language
 
 ### Stories next on list
 
-As a Developer, I can DO_SOMETHING, so that I QUALITY_OF_LIFE
-
-- Subtask
+As a Polyglot Developer, I want to be up and running in any development language with consistency, so I am productive and using best practices [EPIC]
 
 ### Tasks next on list
+
+BaseBuilder
+
+## Stories and tasks
+
+### Tasks - completed
 
 Setup RubyGems and RubyDoc
 
 - Build and deploy gem to [rubygems.org](https://rubygems.org/gems/k_builder)
 - Attach documentation to [rubydoc.info](https://rubydoc.info/github/to-do-/k_builder/master)
-
-Setup GitHub Action (test and lint)
-
-- Setup Rspec action
-- Setup RuboCop action
-
-## Stories and tasks
-
-### Tasks - completed
 
 Setup project management, requirement and SCRUM documents
 
@@ -34,6 +29,11 @@ Setup project management, requirement and SCRUM documents
 - Setup user stories and tasks
 - Setup a project backlog
 - Setup an examples/usage document
+
+Setup GitHub Action (test and lint)
+
+- Setup Rspec action
+- Setup RuboCop action
 
 Setup new Ruby GEM
 
