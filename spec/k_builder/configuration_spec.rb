@@ -1,10 +1,9 @@
 # frozen_string_literal: true
 
-require 'tmpdir'
-
 RSpec.describe KBuilder::Configuration do
   let(:builder_module) { KBuilder }
-  let(:temp_folder) { Dir.mktmpdir('my-kbuilder-project') }
+  let(:custom_target_folder_base) { 'my-kbuilder-target' }
+  let(:custom_global_template_folder) { 'my-kbuilder-template' }
   let(:cfg) { ->(config) {} }
 
   before :each do
@@ -24,11 +23,11 @@ RSpec.describe KBuilder::Configuration do
     context 'when configured' do
       let(:cfg) do
         lambda { |config|
-          config.target_folder_base = temp_folder
+          config.target_folder_base = custom_target_folder_base
         }
       end
 
-      it { is_expected.to eq(temp_folder) }
+      it { is_expected.to eq(custom_target_folder_base) }
     end
   end
 
@@ -42,11 +41,11 @@ RSpec.describe KBuilder::Configuration do
     context 'when configured' do
       let(:cfg) do
         lambda { |config|
-          config.global_template_folder = '/some-folder'
+          config.global_template_folder = custom_global_template_folder
         }
       end
 
-      it { is_expected.to eq('/some-folder') }
+      it { is_expected.to eq(custom_global_template_folder) }
     end
   end
 end
