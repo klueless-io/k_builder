@@ -31,7 +31,7 @@ module KBuilder
 
     def debug
       puts '-' * 120
-      puts 'webpack5 configuration'
+      puts 'kbuilder base configuration'
       kv 'target_folder_base'     , target_folder_base
       kv 'global_template_folder' , global_template_folder
     end
