@@ -2,6 +2,11 @@
 
 module KBuilder
   # Base builder defines builder methods, build method and configuration
+  #
+  # Convention: Setter methods (are Fluent) and use the prefix set_
+  #             Getter methods (are NOT fluent) and return the stored value
+  #             Setter methods (are NOT fluent) can be created as needed
+  #             these methods would not be prefixed with the set_
   class BaseBuilder
     attr_reader :hash
 
@@ -10,13 +15,25 @@ module KBuilder
     #
     # @return [type=Object] data structure
     def self.build
-      builder = new
+      init.build
+    end
+
+    def self.init(configuration = nil)
+      builder = new(configuration)
+
+      # Useful for massaging hash values that come in via configuration
+      builder.after_new
+
+      # May want a post initialize event so that concepts like
+      # target_folder can be expanded and stored into the hash
 
       # block.call(builder) if !block.nil?
       yield(builder) if block_given?
 
-      builder.build
+      builder
     end
+
+    def after_new; end
 
     # assigns a builder hash and defines builder methods
     def initialize
@@ -71,13 +88,12 @@ module KBuilder
       self
     end
 
+    # Defines a method using the convention set_[method_name]
     #
-    # defines a method
-    # @param method_name [type=String]
-    #
-    # @return [type=Symbol] e.g. method symbol
+    # Convention: Setter methods (are Fluent) and use the prefix set_
+    #             Getter methods (are NOT fluent) and return the stored value
     def define_builder_method(method_name)
-      self.class.send(:define_method, method_name) do |value|
+      self.class.send(:define_method, "set_#{method_name}") do |value|
         @hash[method_name.to_s] = value
         self
       end
