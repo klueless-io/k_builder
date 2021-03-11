@@ -3,11 +3,10 @@
 module KBuilder
   # Base builder defines builder methods, build method and configuration
   class Builder < KBuilder::BaseBuilder
-    BUILDER_METHODS = %w[
-      target_folder
-      template_folder
-      template_folder_global
-    ].freeze
+    # BUILDER_METHODS = %w[].freeze
+    # target_folder
+    # template_folder
+    # template_folder_global
 
     def initialize(configuration = nil)
       super()
@@ -21,12 +20,98 @@ module KBuilder
       end
     end
 
+    # rubocop:disable Metrics/AbcSize
+    def after_new
+      # ensure that any configured folders are expanded
+      self.target_folder = hash['target_folder'] unless hash['target_folder'].nil?
+      self.template_folder = hash['template_folder'] unless hash['template_folder'].nil?
+      self.template_folder_global = hash['template_folder_global'] unless hash['template_folder_global'].nil?
+    end
+    # rubocop:enable Metrics/AbcSize
+
     # def build
     #   # SomeDryStruct.new(hash)
     # end
 
+    # ----------------------------------------------------------------------
+    # Attributes: The following getter/setters can be referenced outside of
+    #             the builder fluent API
+    # set_      : Only setters with the prefix _set are considered fluent.
+    # ----------------------------------------------------------------------
+
+    # Target folder
+    # ----------------------------------------------------------------------
+
+    # Fluent setter for target folder
+    def set_target_folder(value)
+      self.target_folder = value
+
+      self
+    end
+
+    # Setter for target folder
+    def target_folder=(value)
+      hash['target_folder'] = File.expand_path(value)
+    end
+
+    # Getter for target folder
+    def target_folder
+      hash['target_folder']
+    end
+
+    # Template folder
+    # ----------------------------------------------------------------------
+
+    # Fluent setter for template folder
+    def set_template_folder(value)
+      self.template_folder = value
+
+      self
+    end
+
+    # Setter for template folder
+    def template_folder=(value)
+      hash['template_folder'] = File.expand_path(value)
+    end
+
+    # Getter for template folder
+    def template_folder
+      hash['template_folder']
+    end
+
+    # Global Target folder
+    # ----------------------------------------------------------------------
+
+    # Fluent setter for global template folder
+    def set_template_folder_global(value)
+      self.template_folder_global = value
+
+      self
+    end
+
+    # Setter for global template folder
+    def template_folder_global=(value)
+      hash['template_folder_global'] = File.expand_path(value)
+    end
+
+    # Setter for global template folder
+    def template_folder_global
+      hash['template_folder_global']
+    end
+
+    def output_path
+      File.expand_path(hash['target_folder'])
+    end
+
+    # Global Target folder
+    # ----------------------------------------------------------------------
+
+    def target_file(file)
+      File.join(output_path, file)
+    end
+
     def builder_methods
-      BUILDER_METHODS
+      []
     end
   end
 end
