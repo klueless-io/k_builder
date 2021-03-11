@@ -21,19 +21,28 @@ module KBuilder
 
   # Configuration class
   class Configuration
-    attr_accessor :target_folder_base
-    attr_accessor :global_template_folder
+    attr_accessor :target_folder
+    attr_accessor :template_folder
+    attr_accessor :template_folder_global
 
     def initialize
-      @target_folder_base = Dir.getwd
-      @global_template_folder = File.join(Dir.getwd, '.templates')
+      @target_folder = Dir.getwd
+      @template_folder = File.join(Dir.getwd, '.templates')
+      @template_folder_global = nil
     end
 
     def debug
       puts '-' * 120
       puts 'kbuilder base configuration'
-      kv 'target_folder_base'     , target_folder_base
-      kv 'global_template_folder' , global_template_folder
+      kv 'target_folder'         , target_folder
+      kv 'template_folder'       , template_folder
+      kv 'template_folder_global', template_folder_global
+    end
+
+    def to_hash
+      hash = {}
+      instance_variables.each { |var| hash[var.to_s.delete('@')] = instance_variable_get(var) }
+      hash
     end
 
     private
