@@ -116,7 +116,7 @@ RSpec.describe KBuilder::Builder do
     end
   end
 
-  fcontext 'custom setter / getters' do
+  context 'custom setter / getters' do
     describe '#set_target_folder (fluent setter) / .target_folder (plain get)' do
       subject { described_class.init({}).set_target_folder('~/yyy').target_folder }
 
@@ -133,20 +133,6 @@ RSpec.describe KBuilder::Builder do
       subject { described_class.init({}).set_template_folder_global('~/yyy').template_folder_global }
 
       it { is_expected.to eq(File.expand_path('~/yyy')) }
-    end
-  end
-
-  describe 'output_path' do
-    subject { described_class.new.set_target_folder(folder).output_path }
-
-    let(:folder) { '/xmen' }
-
-    it { is_expected.to eq('/xmen') }
-
-    context 'with expanded path' do
-      let(:folder) { '~/xmen' }
-
-      it { is_expected.to eq(File.expand_path('~/xmen')) }
     end
   end
 
