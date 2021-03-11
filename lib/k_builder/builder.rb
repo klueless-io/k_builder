@@ -3,7 +3,7 @@
 module KBuilder
   # Base builder defines builder methods, build method and configuration
   class Builder < KBuilder::BaseBuilder
-    # BUILDER_METHODS = %w[].freeze
+    # builder_setter_methods = %w[].freeze
     # target_folder
     # template_folder
     # template_folder_global
@@ -110,7 +110,7 @@ module KBuilder
       File.join(output_path, file)
     end
 
-    def builder_methods
+    def builder_setter_methods
       []
     end
   end
