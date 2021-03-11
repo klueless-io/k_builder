@@ -18,33 +18,47 @@ module KBuilder
       init.build
     end
 
+    # Create and initialize the builder.
+    #
+    # Initialization can be done via any of these three sequential steps.
+    #   - Configuration hash
+    #   - After new event
+    #   - Configuration block (lambda)
+    #
+    # @return [Builder] Returns the builder via fluent interface
     def self.init(configuration = nil)
       builder = new(configuration)
 
-      # Useful for massaging hash values that come in via configuration
       builder.after_new
 
-      # May want a post initialize event so that concepts like
-      # target_folder can be expanded and stored into the hash
-
-      # block.call(builder) if !block.nil?
       yield(builder) if block_given?
 
       builder
     end
 
+    # Use after_new to massage hash values that come in via
+    # configuration into more complex values
+    #
+    # Abstract method
     def after_new; end
 
     # assigns a builder hash and defines builder methods
     def initialize
       @hash = {}
-      define_builder_methods
+      define_builder_setter_methods
     end
 
-    def builder_methods
+    # Return an array of symbols to represent the fluent 
+    # setter methods that you want on your builder.
+    #
+    # Abstract method
+    def builder_setter_methods
       raise NotImplementedError
     end
 
+    # @return [Hash/StrongType] Returns data object, can be a hash
+    #                           or strong typed object that you 
+    #                           have wrapped around the hash
     def build
       hash
     end
@@ -79,12 +93,11 @@ module KBuilder
       end
     end
 
+    # Defines all of the necessary builder setter methods
     #
-    # defines all of the necessary builder methods
-    #
-    # @return [type] [description]
-    def define_builder_methods
-      builder_methods.each { |method| define_builder_method(method) }
+    # @return [Builder] Returns the builder via fluent interface
+    def define_builder_setter_methods
+      builder_setter_methods.each { |method| define_builder_method(method) }
       self
     end
 
@@ -92,6 +105,8 @@ module KBuilder
     #
     # Convention: Setter methods (are Fluent) and use the prefix set_
     #             Getter methods (are NOT fluent) and return the stored value
+    #
+    # @return [Builder] Returns the builder via fluent interface
     def define_builder_method(method_name)
       self.class.send(:define_method, "set_#{method_name}") do |value|
         @hash[method_name.to_s] = value
