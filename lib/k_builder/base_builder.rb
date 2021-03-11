@@ -48,7 +48,7 @@ module KBuilder
       define_builder_setter_methods
     end
 
-    # Return an array of symbols to represent the fluent 
+    # Return an array of symbols to represent the fluent
     # setter methods that you want on your builder.
     #
     # Abstract method
@@ -57,7 +57,7 @@ module KBuilder
     end
 
     # @return [Hash/StrongType] Returns data object, can be a hash
-    #                           or strong typed object that you 
+    #                           or strong typed object that you
     #                           have wrapped around the hash
     def build
       hash
