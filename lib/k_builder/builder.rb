@@ -99,15 +99,11 @@ module KBuilder
       hash['template_folder_global']
     end
 
-    def output_path
-      File.expand_path(hash['target_folder'])
-    end
-
     # Global Target folder
     # ----------------------------------------------------------------------
 
     def target_file(file)
-      File.join(output_path, file)
+      File.join(target_folder, file)
     end
 
     def builder_setter_methods
