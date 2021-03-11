@@ -2,7 +2,8 @@
 
 require 'k_builder/version'
 require 'k_builder/configuration'
-require 'k_builder/context'
+require 'k_builder/base_builder'
+require 'k_builder/builder'
 
 module KBuilder
   # raise KBuilder::Error, 'Sample message'
