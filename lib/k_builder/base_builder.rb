@@ -1,111 +1,86 @@
 # frozen_string_literal: true
 
 module KBuilder
-  # Context is a data object holding onto state that is used when building webpack configuration.
+  # Base builder defines builder methods, build method and configuration
   class BaseBuilder
-    attr_accessor :context
+    attr_reader :hash
 
-    # Base build requires context data to store state,
-    def initialize(context = nil)
-      self.context = if context.nil?
-                       KBuilder.configuration.dup
-                     else
-                       context
-                     end
-    end
-
-    def output_path
-      @output_path ||= File.expand_path(context.target_folder)
-    end
-
-    def target_file(file)
-      File.expand_path(File.join(output_path, file))
-    end
-
-    def template_path
-      @template_path ||= File.expand_path(context.template_folder)
-    end
-
-    def template_file(file)
-      File.expand_path(File.join(template_path, file))
-    end
-
-    # Add a file to the target location
+    # Factory method that provides a builder for a specified structure
+    # runs through a configuration block and then builds the final structure
     #
-    # @param [String] file The file name with or without relative path, eg. myfile.json or src/myfile.json
-    # @option opts [String] :content Supply the content that you want to write to the file
-    # @option opts [String] :template Supply the template that you want to write to the file, template will be processed  ('nobody') From address
-    # @option opts [String] :to Recipient email
-    # @option opts [String] :body ('') The email's body
-    def add_file(file, **opts)
-      file = target_file(file)
+    # @return [type=Object] data structure
+    def self.build
+      builder = new
 
-      FileUtils.mkdir_p(File.dirname(file))
+      # block.call(builder) if !block.nil?
+      yield(builder) if block_given?
 
-      content = transform_content(**opts)
+      builder.build
+    end
 
-      File.write(file, content)
+    # assigns a builder hash and defines builder methods
+    def initialize
+      @hash = {}
+      define_builder_methods
+    end
 
-      run_prettier file if opts.key?(:pretty)
+    def builder_methods
+      raise NotImplementedError
+    end
 
+    def build
+      hash
+    end
+
+    # builds a nested structure by either builder block or hash
+    # @param data_structure [type=DataStructure]
+    # @param builder [type=Builder]
+    # @param attributes [type=Hash|DataStructure instance]
+    # @param &block
+    #
+    # @return [type=Hash]
+    def build_nested(data_structure, builder, attributes = {}, &block)
+      if block_given?
+        builder.build(&block).to_h
+      else
+        build_hash(data_structure, attributes)
+      end
+    end
+
+    private
+
+    #
+    # @param data_structure [type=DataStructure]
+    # @param attributes [type=Hash, DataStructure]
+    #
+    # @return [type=Hash]
+    def build_hash(data_structure, attributes)
+      if attributes.is_a?(data_structure)
+        attributes.to_h
+      else
+        data_structure.new(attributes).to_h
+      end
+    end
+
+    #
+    # defines all of the necessary builder methods
+    #
+    # @return [type] [description]
+    def define_builder_methods
+      builder_methods.each { |method| define_builder_method(method) }
       self
     end
 
-    # Transform content will take any one of the following
-    #  - Raw content
-    #  - File based content
-    #  - Template (via handlebars)
-    #  - File base template
-    # and convert the input to final content output
     #
-    # @param [String] file The file name with or without relative path, eg. my_file.json or src/my_file.json
-    # @option opts [String] :content Supply the content that you want to write to the file
-    # @option opts [String] :template Supply the template that you want to write to the file, template will be transformed using handlebars
-    # @option opts [String] :content_file File with content, file location is based on where the program is running
-    # @option opts [String] :template_file File with handlebars templated content that will be transformed, file location is based on the configured template_path
-    def transform_content(**opts)
-      result = handle_content(**opts)
-
-      return result if result
-
-      template = if !opts[:template].nil?
-                   opts[:template]
-                 elsif !opts[:template_file].nil?
-                   tf = template_file(opts[:template_file])
-                   return "Template not found: #{opts[:template_file]}" unless File.exist?(tf)
-
-                   File.read(tf)
-                 end
-
-      return '' if template.nil?
-
-      Handlebars::Helpers::Template.render(template, opts)
+    # defines a method
+    # @param method_name [type=String]
+    #
+    # @return [type=Symbol] e.g. method symbol
+    def define_builder_method(method_name)
+      self.class.send(:define_method, method_name) do |value|
+        @hash[method_name.to_s] = value
+        self
+      end
     end
-
-    def handle_content(**opts)
-      return opts[:content] unless opts[:content].nil?
-
-      return unless opts[:content_file]
-
-      cf = opts[:content_file]
-      return "Content not found: #{File.expand_path(cf)}" unless File.exist?(cf)
-
-      File.read(cf)
-    end
-
-    def run_prettier(file)
-      command = "prettier --check #{file} --write #{file}"
-      run_command command
-    end
-
-    def run_command(command)
-      # Deep path create if needed
-      FileUtils.mkdir_p(output_path)
-
-      build_command = "cd #{output_path} && #{command}"
-
-      system(build_command)
-    end
-    alias rc run_command
   end
 end
