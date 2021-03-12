@@ -23,12 +23,12 @@ module KBuilder
   class Configuration
     attr_accessor :target_folder
     attr_accessor :template_folder
-    attr_accessor :template_folder_global
+    attr_accessor :global_template_folder
 
     def initialize
       @target_folder = Dir.getwd
       @template_folder = File.join(Dir.getwd, '.templates')
-      @template_folder_global = nil
+      @global_template_folder = nil
     end
 
     def debug
@@ -36,7 +36,7 @@ module KBuilder
       puts 'kbuilder base configuration'
       kv 'target_folder'         , target_folder
       kv 'template_folder'       , template_folder
-      kv 'template_folder_global', template_folder_global
+      kv 'global_template_folder', global_template_folder
     end
 
     def to_hash

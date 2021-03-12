@@ -6,7 +6,7 @@ module KBuilder
     # builder_setter_methods = %w[].freeze
     # target_folder
     # template_folder
-    # template_folder_global
+    # global_template_folder
 
     def initialize(configuration = nil)
       configuration = KBuilder.configuration.to_hash if configuration.nil?
@@ -19,7 +19,7 @@ module KBuilder
       # ensure that any configured folders are expanded
       self.target_folder = hash['target_folder'] unless hash['target_folder'].nil?
       self.template_folder = hash['template_folder'] unless hash['template_folder'].nil?
-      self.template_folder_global = hash['template_folder_global'] unless hash['template_folder_global'].nil?
+      self.global_template_folder = hash['global_template_folder'] unless hash['global_template_folder'].nil?
     end
     # rubocop:enable Metrics/AbcSize
 
@@ -81,20 +81,20 @@ module KBuilder
     # ----------------------------------------------------------------------
 
     # Fluent setter for global template folder
-    def set_template_folder_global(value)
-      self.template_folder_global = value
+    def set_global_template_folder(value)
+      self.global_template_folder = value
 
       self
     end
 
     # Setter for global template folder
-    def template_folder_global=(value)
-      hash['template_folder_global'] = File.expand_path(value)
+    def global_template_folder=(value)
+      hash['global_template_folder'] = File.expand_path(value)
     end
 
     # Setter for global template folder
-    def template_folder_global
-      hash['template_folder_global']
+    def global_template_folder
+      hash['global_template_folder']
     end
 
     # Internal Actions are considered helpers for the builder, they do
@@ -110,7 +110,30 @@ module KBuilder
       File.join(target_folder, file)
     end
 
-    # Supply content from a content sources
+    # Gets a template_file relative to the template folder
+    def template_file(file)
+      File.join(template_folder, file)
+    end
+
+    # Gets a global_template_file relative to the global template folder
+    def global_template_file(file)
+      File.join(global_template_folder, file)
+    end
+
+    # Gets a template_file relative to the template folder, looks first in
+    # local template folder and if not found, looks in global template folder
+    def find_template_file(file)
+      full_file = template_file(file)
+      return full_file if File.exist?(full_file)
+
+      full_file = global_template_file(file)
+      return full_file if File.exist?(full_file)
+
+      # File not found
+      nil
+    end
+
+    # Use content from a a selection of content sources
     #
     # @option opts [String] :content Just pass through the :content as is.
     # @option opts [String] :content_file Read content from the :content_file
@@ -120,16 +143,95 @@ module KBuilder
     # @option opts [String] :content_url Read content from the :content_url
     #
     # @return Returns some content
-    def supply_content(**opts)
+    def use_content(**opts)
       return opts[:content] unless opts[:content].nil?
 
       return unless opts[:content_file]
 
       cf = opts[:content_file]
+
       return "Content not found: #{File.expand_path(cf)}" unless File.exist?(cf)
 
       File.read(cf)
     end
+
+    # Use template from a a selection of template sources
+    #
+    # @option opts [String] :template Just pass through the :template as is.
+    # @option opts [String] :template_file Read template from the :template_file
+    #
+    # @return Returns some template
+    def use_template(**opts)
+      return opts[:template] unless opts[:template].nil?
+
+      return unless opts[:template_file]
+
+      tf = find_template_file(opts[:template_file])
+
+      return "template not found: #{opts[:template_file]}" if tf.nil?
+
+      File.read(tf)
+    end
+
+    # Transform content will take any one of the following
+    #  - Raw Template
+    #  - File base template
+    # and convert the input to final content output using options for data
+    #
+    # @param [String] file The file name with or without relative path, eg. my_file.json or src/my_file.json
+    # @option opts [String] :content Supply the content that you want to write to the file
+    # @option opts [String] :template Supply the template that you want to write to the file, template will be transformed using handlebars
+    # @option opts [String] :content_file File with content, file location is based on where the program is running
+    # @option opts [String] :template_file File with handlebars templated content that will be transformed, file location is based on the configured template_path
+    def transform_content(**opts)
+      result = grab_content(**opts)
+
+      return result if result
+
+      template = if !opts[:template].nil?
+                   opts[:template]
+                 elsif !opts[:template_file].nil?
+                   tf = template_file(opts[:template_file])
+                   return "Template not found: #{opts[:template_file]}" unless File.exist?(tf)
+
+                   File.read(tf)
+                 end
+
+      return '' if template.nil?
+
+      Handlebars::Helpers::Template.render(template, opts)
+    end
+
+    # # Transform content will take any one of the following
+    # #  - Raw content
+    # #  - File based content
+    # #  - Template (via handlebars)
+    # #  - File base template
+    # # and convert the input to final content output
+    # #
+    # # @param [String] file The file name with or without relative path, eg. my_file.json or src/my_file.json
+    # # @option opts [String] :content Supply the content that you want to write to the file
+    # # @option opts [String] :template Supply the template that you want to write to the file, template will be transformed using handlebars
+    # # @option opts [String] :content_file File with content, file location is based on where the program is running
+    # # @option opts [String] :template_file File with handlebars templated content that will be transformed, file location is based on the configured template_path
+    # def transform_content(**opts)
+    #   result = grab_content(**opts)
+
+    #   return result if result
+
+    #   template = if !opts[:template].nil?
+    #                 opts[:template]
+    #               elsif !opts[:template_file].nil?
+    #                 tf = template_file(opts[:template_file])
+    #                 return "Template not found: #{opts[:template_file]}" unless File.exist?(tf)
+
+    #                 File.read(tf)
+    #               end
+
+    #   return '' if template.nil?
+
+    #   Handlebars::Helpers::Template.render(template, opts)
+    # end
 
     def builder_setter_methods
       []
