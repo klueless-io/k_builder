@@ -17,6 +17,12 @@ RSpec.describe KBuilder::BaseBuilder do
     it { expect { subject }.to raise_error NotImplementedError }
   end
 
+  describe '#init' do
+    subject { described_class.init }
+
+    it { expect { subject }.to raise_error NotImplementedError }
+  end
+
   describe '#build' do
     subject { described_class.build }
 

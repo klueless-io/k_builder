@@ -43,8 +43,15 @@ module KBuilder
     def after_new; end
 
     # assigns a builder hash and defines builder methods
-    def initialize
+    def initialize(configuration = nil)
       @hash = {}
+
+      unless configuration.nil?
+        raise KBuilder::StandardError, 'Unknown configuration object' unless configuration.is_a?(Hash)
+
+        hash.merge!(configuration)
+      end
+
       define_builder_setter_methods
     end
 
