@@ -136,7 +136,7 @@ RSpec.describe KBuilder::Builder do
     end
   end
 
-  describe 'target_path' do
+  describe '#target_file' do
     subject { described_class.new.set_target_folder(folder).target_file('abc.txt') }
 
     let(:folder) { '/xmen' }
@@ -147,6 +147,25 @@ RSpec.describe KBuilder::Builder do
       let(:folder) { '~/xmen' }
 
       it { is_expected.to eq(File.join(File.expand_path('~/xmen'), 'abc.txt')) }
+    end
+  end
+
+  describe '#supply_content' do
+    subject { described_class.new.supply_content(**opts) }
+
+    let(:opts) { '/xmen' }
+
+    context 'with :content' do
+      let(:opts) { { content: 'Content is supplied and passed through in one action' } }
+
+      it { is_expected.to eq('Content is supplied and passed through in one action') }
+    end
+
+    context 'with :content_file' do
+      let(:opts) { { content_file: file } }
+      let(:file) { described_class.new.set_target_folder(Dir.getwd).target_file('spec/samples/some-text.txt') }
+
+      it { is_expected.to eq('Some text from a text file') }
     end
   end
 end
