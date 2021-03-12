@@ -35,7 +35,7 @@ RSpec.describe KBuilder::Builder do
             .to  be_a(Hash)
             .and include('target_folder' => builder_module.configuration.target_folder)
             .and include('template_folder' => builder_module.configuration.template_folder)
-            .and include('template_folder_global' => builder_module.configuration.template_folder_global)
+            .and include('global_template_folder' => builder_module.configuration.global_template_folder)
         end
       end
 
@@ -51,7 +51,7 @@ RSpec.describe KBuilder::Builder do
             {
               'target_folder' => nil,
               'template_folder' => nil,
-              'template_folder_global' => nil
+              'global_template_folder' => nil
             }
           end
 
@@ -60,7 +60,7 @@ RSpec.describe KBuilder::Builder do
               .to  be_a(Hash)
               .and include('target_folder' => be_nil)
               .and include('template_folder' => be_nil)
-              .and include('template_folder_global' => be_nil)
+              .and include('global_template_folder' => be_nil)
           end
         end
 
@@ -69,7 +69,7 @@ RSpec.describe KBuilder::Builder do
             {
               'target_folder' => '/xmen',
               'template_folder' => '/xmen',
-              'template_folder_global' => '/xmen'
+              'global_template_folder' => '/xmen'
             }
           end
 
@@ -78,7 +78,7 @@ RSpec.describe KBuilder::Builder do
               .to  be_a(Hash)
               .and include('target_folder' => eq('/xmen'))
               .and include('template_folder' => eq('/xmen'))
-              .and include('template_folder_global' => eq('/xmen'))
+              .and include('global_template_folder' => eq('/xmen'))
           end
         end
 
@@ -87,7 +87,7 @@ RSpec.describe KBuilder::Builder do
             {
               'target_folder' => '~/xmen',
               'template_folder' => '~/xmen',
-              'template_folder_global' => '~/xmen'
+              'global_template_folder' => '~/xmen'
             }
           end
 
@@ -96,7 +96,7 @@ RSpec.describe KBuilder::Builder do
               .to  be_a(Hash)
               .and include('target_folder' => eq(File.expand_path('~/xmen')))
               .and include('template_folder' => eq(File.expand_path('~/xmen')))
-              .and include('template_folder_global' => eq(File.expand_path('~/xmen')))
+              .and include('global_template_folder' => eq(File.expand_path('~/xmen')))
           end
         end
       end
@@ -111,7 +111,7 @@ RSpec.describe KBuilder::Builder do
           .to  be_a(Hash) # Child class may return a DryStruct or OpenStruct
           .and include('target_folder' => builder_module.configuration.target_folder)
           .and include('template_folder' => builder_module.configuration.template_folder)
-          .and include('template_folder_global' => builder_module.configuration.template_folder_global)
+          .and include('global_template_folder' => builder_module.configuration.global_template_folder)
       end
     end
   end
@@ -129,8 +129,8 @@ RSpec.describe KBuilder::Builder do
       it { is_expected.to eq(File.expand_path('~/yyy')) }
     end
 
-    describe '#set_template_folder_global (fluent setter) / .template_folder_global (plain get)' do
-      subject { described_class.init({}).set_template_folder_global('~/yyy').template_folder_global }
+    describe '#set_global_template_folder (fluent setter) / .global_template_folder (plain get)' do
+      subject { described_class.init({}).set_global_template_folder('~/yyy').global_template_folder }
 
       it { is_expected.to eq(File.expand_path('~/yyy')) }
     end
@@ -150,10 +150,72 @@ RSpec.describe KBuilder::Builder do
     end
   end
 
-  describe '#supply_content' do
-    subject { described_class.new.supply_content(**opts) }
+  describe '#template_file' do
+    subject { described_class.new.set_template_folder(folder).template_file('abc.txt') }
 
-    let(:opts) { '/xmen' }
+    let(:folder) { '/xmen' }
+
+    it { is_expected.to eq('/xmen/abc.txt') }
+
+    context 'with expanded path' do
+      let(:folder) { '~/xmen' }
+
+      it { is_expected.to eq(File.join(File.expand_path('~/xmen'), 'abc.txt')) }
+    end
+  end
+
+  describe '#global_template_file' do
+    subject { described_class.new.set_global_template_folder(folder).global_template_file('abc.txt') }
+
+    let(:folder) { '/xmen' }
+
+    it { is_expected.to eq('/xmen/abc.txt') }
+
+    context 'with expanded path' do
+      let(:folder) { '~/xmen' }
+
+      it { is_expected.to eq(File.join(File.expand_path('~/xmen'), 'abc.txt')) }
+    end
+  end
+
+  describe '#find_template_file' do
+    subject do
+      described_class
+        .new
+        .set_template_folder(local_folder)
+        .set_global_template_folder(global_folder)
+        .find_template_file(file)
+    end
+
+    let(:local_folder) { File.join(Dir.getwd, 'spec', 'samples', 'app-template') }
+    let(:global_folder) { File.join(Dir.getwd, 'spec', 'samples', 'global-template') }
+    let(:file) { 'bad-file.txt' }
+
+    context 'with file not found in either store' do
+      it { is_expected.to be_nil }
+    end
+
+    context 'with file in both local and global folder' do
+      let(:file) { 'template1.txt' }
+
+      it { is_expected.to eq(File.join(local_folder, file)) }
+    end
+
+    context 'with file only in global folder' do
+      let(:file) { 'template2.txt' }
+
+      it { is_expected.to eq(File.join(global_folder, file)) }
+    end
+  end
+
+  describe '#use_content' do
+    subject { described_class.new.use_content(**opts) }
+
+    context 'with :unhandled option' do
+      let(:opts) { {} }
+
+      it { is_expected.to be_nil }
+    end
 
     context 'with :content' do
       let(:opts) { { content: 'Content is supplied and passed through in one action' } }
@@ -168,4 +230,73 @@ RSpec.describe KBuilder::Builder do
       it { is_expected.to eq('Some text from a text file') }
     end
   end
+
+  describe '#use_template' do
+    subject { described_class.new.use_template(**opts) }
+    subject do
+      described_class
+        .new
+        .set_template_folder(local_folder)
+        .set_global_template_folder(global_folder)
+        .use_template(**opts)
+    end
+
+    let(:local_folder) { File.join(Dir.getwd, 'spec', 'samples', 'app-template') }
+    let(:global_folder) { File.join(Dir.getwd, 'spec', 'samples', 'global-template') }
+    let(:file) { 'bad-file.txt' }
+
+    context 'with :unhandled option' do
+      let(:opts) { {} }
+
+      it { is_expected.to be_nil }
+    end
+
+    context 'with :template' do
+      let(:opts) { { template: 'Hello {{name}}' } }
+
+      it { is_expected.to eq('Hello {{name}}') }
+    end
+
+    context 'with :template_file (file not found)' do
+      let(:opts) { { template_file: file } }
+      let(:file) { 'bad-file.txt' }
+
+      it { is_expected.to eq('template not found: bad-file.txt') }
+    end
+
+    context 'with :template_file (template1 exists in app and global folder)' do
+      let(:opts) { { template_file: file } }
+      let(:file) { 'template1.txt' }
+
+      it { is_expected.to eq('App template 1 - Hello {{name}}') }
+    end
+
+    context 'with :template_file (template2 exists in global folder only)' do
+      let(:opts) { { template_file: file } }
+      let(:file) { 'template2.txt' }
+
+      it { is_expected.to eq('Global template 2 - Hello {{name}}') }
+    end
+  end
+
+  # describe '#transform_content' do
+  #   subject { described_class.new.transform_content(**opts) }
+
+  #   let(:opts) { {} }
+
+  #   it { is_expected.to be_empty }
+
+  #   # context 'with :content' do
+  #   #   let(:opts) { { content: 'Content is supplied and passed through in one action' } }
+
+  #   #   it { is_expected.to eq('Content is supplied and passed through in one action') }
+  #   # end
+
+  #   # context 'with :content_file' do
+  #   #   let(:opts) { { content_file: file } }
+  #   #   let(:file) { described_class.new.set_target_folder(Dir.getwd).target_file('spec/samples/some-text.txt') }
+
+  #   #   it { is_expected.to eq('Some text from a text file') }
+  #   # end
+  # end
 end

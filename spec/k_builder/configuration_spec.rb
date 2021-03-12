@@ -6,7 +6,7 @@ RSpec.describe KBuilder::Configuration do
 
   let(:custom_target_folder) { '~/my-target-folder' }
   let(:custom_template_folder) { '~/my-template-folder' }
-  let(:custom_template_folder_global) { '~/my-template-folder-global' }
+  let(:custom_global_template_folder) { '~/my-template-folder-global' }
 
   before :each do
     builder_module.configure(&cfg)
@@ -51,8 +51,8 @@ RSpec.describe KBuilder::Configuration do
     end
   end
 
-  describe '.template_folder_global' do
-    subject { builder_module.configuration.template_folder_global }
+  describe '.global_template_folder' do
+    subject { builder_module.configuration.global_template_folder }
 
     context 'when not configured' do
       it { is_expected.to be_nil }
@@ -61,11 +61,11 @@ RSpec.describe KBuilder::Configuration do
     context 'when configured' do
       let(:cfg) do
         lambda { |config|
-          config.template_folder_global = custom_template_folder_global
+          config.global_template_folder = custom_global_template_folder
         }
       end
 
-      it { is_expected.to eq(custom_template_folder_global) }
+      it { is_expected.to eq(custom_global_template_folder) }
     end
   end
 
@@ -76,7 +76,7 @@ RSpec.describe KBuilder::Configuration do
       is_expected
         .to  include('target_folder' => builder_module.configuration.target_folder)
         .and include('template_folder' => builder_module.configuration.template_folder)
-        .and include('template_folder_global' => builder_module.configuration.template_folder_global)
+        .and include('global_template_folder' => builder_module.configuration.global_template_folder)
     end
   end
 end
