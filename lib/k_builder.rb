@@ -5,6 +5,8 @@ require 'k_builder/configuration'
 require 'k_builder/base_builder'
 require 'k_builder/builder'
 
+require 'handlebars/helpers/template'
+
 module KBuilder
   # raise KBuilder::Error, 'Sample message'
   class Error < StandardError; end
