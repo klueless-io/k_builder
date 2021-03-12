@@ -173,65 +173,27 @@ module KBuilder
       File.read(tf)
     end
 
-    # Transform content will take any one of the following
-    #  - Raw Template
-    #  - File base template
-    # and convert the input to final content output using options for data
+    # Process content will take any one of the following
+    #  - Raw content
+    #  - File based content
+    #  - Raw template (translated via handlebars)
+    #  - File base template (translated via handlebars)
     #
-    # @param [String] file The file name with or without relative path, eg. my_file.json or src/my_file.json
+    # Process any of the above inputs to create final content output
+    #
     # @option opts [String] :content Supply the content that you want to write to the file
     # @option opts [String] :template Supply the template that you want to write to the file, template will be transformed using handlebars
     # @option opts [String] :content_file File with content, file location is based on where the program is running
     # @option opts [String] :template_file File with handlebars templated content that will be transformed, file location is based on the configured template_path
-    def transform_content(**opts)
-      result = grab_content(**opts)
+    def process_any_content(**opts)
+      raw_content = use_content(**opts)
 
-      return result if result
+      return raw_content if raw_content
 
-      template = if !opts[:template].nil?
-                   opts[:template]
-                 elsif !opts[:template_file].nil?
-                   tf = template_file(opts[:template_file])
-                   return "Template not found: #{opts[:template_file]}" unless File.exist?(tf)
+      template_content = use_template(**opts)
 
-                   File.read(tf)
-                 end
-
-      return '' if template.nil?
-
-      Handlebars::Helpers::Template.render(template, opts)
+      Handlebars::Helpers::Template.render(template_content, opts) unless template_content.nil?
     end
-
-    # # Transform content will take any one of the following
-    # #  - Raw content
-    # #  - File based content
-    # #  - Template (via handlebars)
-    # #  - File base template
-    # # and convert the input to final content output
-    # #
-    # # @param [String] file The file name with or without relative path, eg. my_file.json or src/my_file.json
-    # # @option opts [String] :content Supply the content that you want to write to the file
-    # # @option opts [String] :template Supply the template that you want to write to the file, template will be transformed using handlebars
-    # # @option opts [String] :content_file File with content, file location is based on where the program is running
-    # # @option opts [String] :template_file File with handlebars templated content that will be transformed, file location is based on the configured template_path
-    # def transform_content(**opts)
-    #   result = grab_content(**opts)
-
-    #   return result if result
-
-    #   template = if !opts[:template].nil?
-    #                 opts[:template]
-    #               elsif !opts[:template_file].nil?
-    #                 tf = template_file(opts[:template_file])
-    #                 return "Template not found: #{opts[:template_file]}" unless File.exist?(tf)
-
-    #                 File.read(tf)
-    #               end
-
-    #   return '' if template.nil?
-
-    #   Handlebars::Helpers::Template.render(template, opts)
-    # end
 
     def builder_setter_methods
       []
