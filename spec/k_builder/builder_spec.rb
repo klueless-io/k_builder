@@ -3,6 +3,10 @@
 RSpec.describe KBuilder::Builder do
   let(:builder_module) { KBuilder }
   let(:cfg) { ->(config) {} }
+  let(:builder) { described_class.new }
+
+  let(:local_folder) { File.join(Dir.getwd, 'spec', 'samples', 'app-template') }
+  let(:global_folder) { File.join(Dir.getwd, 'spec', 'samples', 'global-template') }
 
   before :each do
     builder_module.configure(&cfg)
@@ -12,7 +16,7 @@ RSpec.describe KBuilder::Builder do
   end
 
   describe '#initialize' do
-    subject { described_class.new }
+    subject { builder }
 
     context 'with default configuration' do
       it { is_expected.not_to be_nil }
@@ -137,7 +141,7 @@ RSpec.describe KBuilder::Builder do
   end
 
   describe '#target_file' do
-    subject { described_class.new.set_target_folder(folder).target_file('abc.txt') }
+    subject { builder.set_target_folder(folder).target_file('abc.txt') }
 
     let(:folder) { '/xmen' }
 
@@ -151,7 +155,7 @@ RSpec.describe KBuilder::Builder do
   end
 
   describe '#template_file' do
-    subject { described_class.new.set_template_folder(folder).template_file('abc.txt') }
+    subject { builder.set_template_folder(folder).template_file('abc.txt') }
 
     let(:folder) { '/xmen' }
 
@@ -165,7 +169,7 @@ RSpec.describe KBuilder::Builder do
   end
 
   describe '#global_template_file' do
-    subject { described_class.new.set_global_template_folder(folder).global_template_file('abc.txt') }
+    subject { builder.set_global_template_folder(folder).global_template_file('abc.txt') }
 
     let(:folder) { '/xmen' }
 
@@ -187,8 +191,6 @@ RSpec.describe KBuilder::Builder do
         .find_template_file(file)
     end
 
-    let(:local_folder) { File.join(Dir.getwd, 'spec', 'samples', 'app-template') }
-    let(:global_folder) { File.join(Dir.getwd, 'spec', 'samples', 'global-template') }
     let(:file) { 'bad-file.txt' }
 
     context 'with file not found in either store' do
@@ -209,7 +211,7 @@ RSpec.describe KBuilder::Builder do
   end
 
   describe '#use_content' do
-    subject { described_class.new.use_content(**opts) }
+    subject { builder.use_content(**opts) }
 
     context 'with :unhandled option' do
       let(:opts) { {} }
@@ -225,14 +227,13 @@ RSpec.describe KBuilder::Builder do
 
     context 'with :content_file' do
       let(:opts) { { content_file: file } }
-      let(:file) { described_class.new.set_target_folder(Dir.getwd).target_file('spec/samples/some-text.txt') }
+      let(:file) { builder.set_target_folder(Dir.getwd).target_file('spec/samples/some-text.txt') }
 
       it { is_expected.to eq('Some text from a text file') }
     end
   end
 
   describe '#use_template' do
-    subject { described_class.new.use_template(**opts) }
     subject do
       described_class
         .new
@@ -241,8 +242,6 @@ RSpec.describe KBuilder::Builder do
         .use_template(**opts)
     end
 
-    let(:local_folder) { File.join(Dir.getwd, 'spec', 'samples', 'app-template') }
-    let(:global_folder) { File.join(Dir.getwd, 'spec', 'samples', 'global-template') }
     let(:file) { 'bad-file.txt' }
 
     context 'with :unhandled option' do
@@ -279,24 +278,61 @@ RSpec.describe KBuilder::Builder do
     end
   end
 
-  # describe '#transform_content' do
-  #   subject { described_class.new.transform_content(**opts) }
+  describe '#process_any_content' do
+    subject do
+      described_class
+        .new
+        .set_target_folder(Dir.getwd)
+        .set_template_folder(local_folder)
+        .set_global_template_folder(global_folder)
+        .process_any_content(**opts)
+    end
 
-  #   let(:opts) { {} }
+    let(:local_folder) { File.join(Dir.getwd, 'spec', 'samples', 'app-template') }
+    let(:global_folder) { File.join(Dir.getwd, 'spec', 'samples', 'global-template') }
 
-  #   it { is_expected.to be_empty }
+    let(:opts) { {} }
 
-  #   # context 'with :content' do
-  #   #   let(:opts) { { content: 'Content is supplied and passed through in one action' } }
+    it { is_expected.to be_nil }
 
-  #   #   it { is_expected.to eq('Content is supplied and passed through in one action') }
-  #   # end
+    context 'with :content' do
+      let(:opts) { { content: 'Content is supplied and passed through in one action' } }
 
-  #   # context 'with :content_file' do
-  #   #   let(:opts) { { content_file: file } }
-  #   #   let(:file) { described_class.new.set_target_folder(Dir.getwd).target_file('spec/samples/some-text.txt') }
+      it { is_expected.to eq('Content is supplied and passed through in one action') }
+    end
 
-  #   #   it { is_expected.to eq('Some text from a text file') }
-  #   # end
-  # end
+    context 'with :content_file' do
+      let(:opts) { { content_file: file } }
+      let(:file) { builder.target_file('spec/samples/some-text.txt') }
+
+      it { is_expected.to eq('Some text from a text file') }
+    end
+
+    context 'with :template' do
+      let(:opts) { { template: 'Hello {{name}}', name: 'Dave' } }
+
+      it { is_expected.to eq('Hello Dave') }
+    end
+
+    context 'with :template_file (file not found)' do
+      let(:opts) { { template_file: file, name: 'Dave' } }
+      let(:file) { 'bad-file.txt' }
+
+      it { is_expected.to eq('template not found: bad-file.txt') }
+    end
+
+    context 'with :template_file (template1 exists in app and global folder)' do
+      let(:opts) { { template_file: file, name: 'Dave' } }
+      let(:file) { 'template1.txt' }
+
+      it { is_expected.to eq('App template 1 - Hello Dave') }
+    end
+
+    context 'with :template_file (template2 exists in global folder only)' do
+      let(:opts) { { template_file: file, name: 'Dave' } }
+      let(:file) { 'template2.txt' }
+
+      it { is_expected.to eq('Global template 2 - Hello Dave') }
+    end
+  end
 end
