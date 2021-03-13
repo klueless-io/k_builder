@@ -344,7 +344,7 @@ RSpec.describe KBuilder::Builder do
         .set_target_folder(@temp_folder)
         .set_template_folder(app_template_folder)
         .set_global_template_folder(global_template_folder)
-        .add_file('my-file.txt', **opts)
+        .add_file(file, **opts)
     end
 
     let(:file) { 'my-file.txt' }
@@ -358,7 +358,7 @@ RSpec.describe KBuilder::Builder do
     end
 
     context 'validate file contents' do
-      subject { File.read(target_file) }
+      subject { File.read(target_file).strip }
 
       context 'when no options provided, this is the equivalent of first touch' do
         it { is_expected.to eq('') }
@@ -399,29 +399,24 @@ RSpec.describe KBuilder::Builder do
 
         it { is_expected.to eq('Global template 2 - Hello Dave in Global Template') }
       end
+
+      context 'when prettier is applied' do
+        let(:opts) { { content: '<h1>make me</h1><p>pretty</p>', pretty: true } }
+        let(:file) { 'make-pretty.html' }
+
+        it {
+          expected = <<~HTML.strip
+            <h1>make me</h1>
+            <p>pretty</p>
+          HTML
+
+          is_expected.to eq(expected)
+        }
+      end
     end
   end
 
-  describe '#prettier' do
-    # context 'process css from source to target' do
-    #   let(:file) { 'make-me-pretty.css' }
-
-    #   fit {
-    #     subject
-
-    #     expected = <<~CSS
-    #     {
-    #       .my-color {
-    #         color: red;
-    #       }
-    #     }
-    #     CSS
-    #   }
-
-    # end
-  end
-
-  describe '#add_file' do
+  describe '#run_prettier' do
     include_context :use_temp_folder
 
     subject { File.read(target_file).strip }

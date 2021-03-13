@@ -50,15 +50,16 @@ module KBuilder
     # @option opts [String] :to Recipient email
     # @option opts [String] :body The email's body
     def add_file(file, **opts)
-      file = target_file(file)
+      full_file = target_file(file)
 
-      FileUtils.mkdir_p(File.dirname(file))
+      FileUtils.mkdir_p(File.dirname(full_file))
 
       content = process_any_content(**opts)
 
-      File.write(file, content)
+      File.write(full_file, content)
 
-      # run_prettier file if opts.key?(:pretty)
+      # Prettier needs to work with the original file name
+      run_prettier file if opts.key?(:pretty)
 
       self
     end
