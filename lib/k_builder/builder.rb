@@ -105,11 +105,13 @@ module KBuilder
     end
 
     # Setter for template folder
+    # Refactor: Make Private
     def template_folder=(value)
       hash['template_folder'] = File.expand_path(value)
     end
 
     # Getter for template folder
+    # Refactor: generate
     def template_folder
       hash['template_folder']
     end
@@ -125,11 +127,13 @@ module KBuilder
     end
 
     # Setter for global template folder
+    # Refactor: Make Private
     def global_template_folder=(value)
       hash['global_template_folder'] = File.expand_path(value)
     end
 
     # Setter for global template folder
+    # Refactor: generate
     def global_template_folder
       hash['global_template_folder']
     end
