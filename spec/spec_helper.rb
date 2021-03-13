@@ -2,6 +2,7 @@
 
 require 'pry'
 require 'bundler/setup'
+require 'support/use_temp_folder'
 require 'k_builder'
 
 # TODO: Improvements needed
