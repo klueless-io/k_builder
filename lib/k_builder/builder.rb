@@ -23,9 +23,45 @@ module KBuilder
     end
     # rubocop:enable Metrics/AbcSize
 
+    # Return an array of symbols to represent the fluent setter methods in this builder.
+    def builder_setter_methods
+      # Currently I have manually created my settings because I needed custom
+      # logic in the settings to handle path expansion
+      []
+    end
+
     # def build
     #   # SomeDryStruct.new(hash)
     # end
+
+    # ----------------------------------------------------------------------
+    # Fluent interface
+    # ----------------------------------------------------------------------
+
+    # Add a file to the target location
+    #
+    # @param [String] file The file name with or without relative path, eg. my_file.json or src/my_file.json
+    # @option opts [String] :content Supply the content that you want to write to the file
+    # @option opts [String] :template Supply the template that you want to write to the file, template will be processed  ('nobody') From address
+    # @option opts [String] :content_file File with content, file location is based on where the program is running
+    # @option opts [String] :template_file File with handlebars templated content that will be transformed, file location is based on the configured template_path
+    #
+    # Extra options will be used as data for templates, e.g
+    # @option opts [String] :to Recipient email
+    # @option opts [String] :body The email's body
+    def add_file(file, **opts)
+      file = target_file(file)
+
+      FileUtils.mkdir_p(File.dirname(file))
+
+      content = process_any_content(**opts)
+
+      File.write(file, content)
+
+      # run_prettier file if opts.key?(:pretty)
+
+      self
+    end
 
     # ----------------------------------------------------------------------
     # Attributes: Think getter/setter
@@ -195,8 +231,19 @@ module KBuilder
       Handlebars::Helpers::Template.render(template_content, opts) unless template_content.nil?
     end
 
-    def builder_setter_methods
-      []
+    def run_prettier(file)
+      command = "prettier --check #{file} --write #{file}"
+      run_command command
     end
+
+    def run_command(command)
+      # Deep path create if needed
+      FileUtils.mkdir_p(target_folder)
+
+      build_command = "cd #{target_folder} && #{command}"
+
+      system(build_command)
+    end
+    alias rc run_command
   end
 end
