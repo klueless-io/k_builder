@@ -231,8 +231,10 @@ module KBuilder
       Handlebars::Helpers::Template.render(template_content, opts) unless template_content.nil?
     end
 
-    def run_prettier(file)
-      command = "prettier --check #{file} --write #{file}"
+    def run_prettier(file, log_level: :log)
+      # command = "prettier --check #{file} --write #{file}"
+      command = "prettier --loglevel #{log_level} --write #{file}"
+
       run_command command
     end
 
