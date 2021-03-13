@@ -404,14 +404,14 @@ RSpec.describe KBuilder::Builder do
         let(:opts) { { content: '<h1>make me</h1><p>pretty</p>', pretty: true } }
         let(:file) { 'make-pretty.html' }
 
-        it {
+        it do
           expected = <<~HTML.strip
             <h1>make me</h1>
             <p>pretty</p>
           HTML
 
           is_expected.to eq(expected)
-        }
+        end
       end
     end
   end
@@ -468,7 +468,7 @@ RSpec.describe KBuilder::Builder do
       let(:file_name) { 'make-pretty.html' }
       let(:content) { '<h1>David</h1><p>Was Here</p>   <p>and here</p>' }
 
-      fit {
+      it do
         expected = <<~HTML.strip
           <h1>David</h1>
           <p>Was Here</p>
@@ -476,7 +476,7 @@ RSpec.describe KBuilder::Builder do
         HTML
 
         is_expected.to eq(expected)
-      }
+      end
     end
   end
 end
