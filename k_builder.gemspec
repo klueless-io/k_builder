@@ -39,5 +39,6 @@ Gem::Specification.new do |spec|
   # spec.extensions    = ['ext/k_builder/extconf.rb']
 
   spec.add_dependency 'handlebars-helpers', '~> 0'
-  # spec.add_dependency 'tty-box',         '~> 0.5.0'
+  # spec.add_dependency "anyway_config"     , ">= 2.0.0"
+  # spec.add_dependency "config"     , ">= 3.0.0"
 end

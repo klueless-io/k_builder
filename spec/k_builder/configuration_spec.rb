@@ -15,24 +15,6 @@ RSpec.describe KBuilder::Configuration do
     builder_module.reset
   end
 
-  describe '.target_folder' do
-    subject { builder_module.configuration.target_folder }
-
-    context 'when not configured' do
-      it { is_expected.to eq(Dir.getwd) }
-    end
-
-    context 'when configured' do
-      let(:cfg) do
-        lambda { |config|
-          config.target_folder = custom_target_folder
-        }
-      end
-
-      it { is_expected.to eq(custom_target_folder) }
-    end
-  end
-
   describe '.template_folder' do
     subject { builder_module.configuration.template_folder }
 
