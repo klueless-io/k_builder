@@ -403,16 +403,6 @@ RSpec.describe KBuilder::Builder do
   end
 
   describe '#prettier' do
-    include_context :use_temp_folder
-    subject do
-      builder
-        .set_target_folder(File.join(Dir.getwd, 'spec', 'samples'))
-        .add_file(content: '{.my-color { color: red;} }')
-        .run_prettier(file)
-    end
-
-    it { puts @temp_folder }
-
     # context 'process css from source to target' do
     #   let(:file) { 'make-me-pretty.css' }
 
@@ -429,5 +419,69 @@ RSpec.describe KBuilder::Builder do
     #   }
 
     # end
+  end
+
+  describe '#add_file' do
+    include_context :use_temp_folder
+
+    subject { File.read(target_file).strip }
+
+    before do
+      builder
+        .set_target_folder(@temp_folder)
+        .set_template_folder(app_template_folder)
+        .set_global_template_folder(global_template_folder)
+        .add_file(file_name, content: content)
+        .run_prettier(file_name, log_level: :silent)
+    end
+
+    let(:target_file) { File.join(@temp_folder, file_name) }
+
+    context 'when css file' do
+      let(:file_name) { 'make-pretty.css' }
+      let(:content) { '{.my-color { color: red;} }' }
+
+      it {
+        expected = <<~CSS.strip
+          {
+            .my-color {
+              color: red;
+            }
+          }
+        CSS
+
+        is_expected.to eq(expected)
+      }
+    end
+
+    context 'when js file' do
+      let(:file_name) { 'make-pretty.js' }
+      let(:content) { 'function Dave() { console.log("was here") }' }
+
+      it {
+        expected = <<~JAVASCRIPT.strip
+          function Dave() {
+            console.log("was here");
+          }
+        JAVASCRIPT
+
+        is_expected.to eq(expected)
+      }
+    end
+
+    context 'when html file' do
+      let(:file_name) { 'make-pretty.html' }
+      let(:content) { '<h1>David</h1><p>Was Here</p>   <p>and here</p>' }
+
+      it {
+        expected = <<~HTML.strip
+          <h1>David</h1>
+          <p>Was Here</p>
+          <p>and here</p>
+        HTML
+
+        is_expected.to eq(expected)
+      }
+    end
   end
 end
