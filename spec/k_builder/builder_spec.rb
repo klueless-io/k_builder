@@ -468,7 +468,7 @@ RSpec.describe KBuilder::Builder do
       let(:file_name) { 'make-pretty.html' }
       let(:content) { '<h1>David</h1><p>Was Here</p>   <p>and here</p>' }
 
-      it {
+      fit {
         expected = <<~HTML.strip
           <h1>David</h1>
           <p>Was Here</p>

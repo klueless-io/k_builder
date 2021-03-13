@@ -234,7 +234,7 @@ module KBuilder
 
     def run_prettier(file, log_level: :log)
       # command = "prettier --check #{file} --write #{file}"
-      command = "prettier --loglevel #{log_level} --write #{file}"
+      command = "npx prettier --loglevel #{log_level} --write #{file}"
 
       run_command command
     end
@@ -244,6 +244,8 @@ module KBuilder
       FileUtils.mkdir_p(target_folder)
 
       build_command = "cd #{target_folder} && #{command}"
+
+      puts build_command
 
       system(build_command)
     end
