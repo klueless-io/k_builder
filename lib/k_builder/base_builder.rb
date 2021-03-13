@@ -70,14 +70,13 @@ module KBuilder
       hash
     end
 
-
     # TODO
     # Support Nesting
     # Support Generation fo the following
     #   - fluent set_
     #   - Support setter (non-fluent)
     #   - Support getter (non-fluent)
-    
+
     # # builds a nested structure by either builder block or hash
     # # @param data_structure [type=DataStructure]
     # # @param builder [type=Builder]
