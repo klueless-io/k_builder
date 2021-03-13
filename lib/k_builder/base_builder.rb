@@ -70,35 +70,43 @@ module KBuilder
       hash
     end
 
-    # builds a nested structure by either builder block or hash
-    # @param data_structure [type=DataStructure]
-    # @param builder [type=Builder]
-    # @param attributes [type=Hash|DataStructure instance]
-    # @param &block
-    #
-    # @return [type=Hash]
-    def build_nested(data_structure, builder, attributes = {}, &block)
-      if block_given?
-        builder.build(&block).to_h
-      else
-        build_hash(data_structure, attributes)
-      end
-    end
+
+    # TODO
+    # Support Nesting
+    # Support Generation fo the following
+    #   - fluent set_
+    #   - Support setter (non-fluent)
+    #   - Support getter (non-fluent)
+    
+    # # builds a nested structure by either builder block or hash
+    # # @param data_structure [type=DataStructure]
+    # # @param builder [type=Builder]
+    # # @param attributes [type=Hash|DataStructure instance]
+    # # @param &block
+    # #
+    # # @return [type=Hash]
+    # def build_nested(data_structure, builder, attributes = {}, &block)
+    #   if block_given?
+    #     builder.build(&block).to_h
+    #   else
+    #     build_hash(data_structure, attributes)
+    #   end
+    # end
 
     private
 
-    #
-    # @param data_structure [type=DataStructure]
-    # @param attributes [type=Hash, DataStructure]
-    #
-    # @return [type=Hash]
-    def build_hash(data_structure, attributes)
-      if attributes.is_a?(data_structure)
-        attributes.to_h
-      else
-        data_structure.new(attributes).to_h
-      end
-    end
+    # #
+    # # @param data_structure [type=DataStructure]
+    # # @param attributes [type=Hash, DataStructure]
+    # #
+    # # @return [type=Hash]
+    # def build_hash(data_structure, attributes)
+    #   if attributes.is_a?(data_structure)
+    #     attributes.to_h
+    #   else
+    #     data_structure.new(attributes).to_h
+    #   end
+    # end
 
     # Defines all of the necessary builder setter methods
     #
