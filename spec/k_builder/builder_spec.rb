@@ -5,8 +5,9 @@ RSpec.describe KBuilder::Builder do
   let(:cfg) { ->(config) {} }
   let(:builder) { described_class.new }
 
-  let(:local_folder) { File.join(Dir.getwd, 'spec', 'samples', 'app-template') }
-  let(:global_folder) { File.join(Dir.getwd, 'spec', 'samples', 'global-template') }
+  let(:samples_folder) { File.join(Dir.getwd, 'spec', 'samples') }
+  let(:app_template_folder) { File.join(Dir.getwd, 'spec', 'samples', 'app-template') }
+  let(:global_template_folder) { File.join(Dir.getwd, 'spec', 'samples', 'global-template') }
 
   before :each do
     builder_module.configure(&cfg)
@@ -186,8 +187,8 @@ RSpec.describe KBuilder::Builder do
     subject do
       described_class
         .new
-        .set_template_folder(local_folder)
-        .set_global_template_folder(global_folder)
+        .set_template_folder(app_template_folder)
+        .set_global_template_folder(global_template_folder)
         .find_template_file(file)
     end
 
@@ -200,13 +201,13 @@ RSpec.describe KBuilder::Builder do
     context 'with file in both local and global folder' do
       let(:file) { 'template1.txt' }
 
-      it { is_expected.to eq(File.join(local_folder, file)) }
+      it { is_expected.to eq(File.join(app_template_folder, file)) }
     end
 
     context 'with file only in global folder' do
       let(:file) { 'template2.txt' }
 
-      it { is_expected.to eq(File.join(global_folder, file)) }
+      it { is_expected.to eq(File.join(global_template_folder, file)) }
     end
   end
 
@@ -237,8 +238,8 @@ RSpec.describe KBuilder::Builder do
     subject do
       described_class
         .new
-        .set_template_folder(local_folder)
-        .set_global_template_folder(global_folder)
+        .set_template_folder(app_template_folder)
+        .set_global_template_folder(global_template_folder)
         .use_template(**opts)
     end
 
@@ -280,16 +281,15 @@ RSpec.describe KBuilder::Builder do
 
   describe '#process_any_content' do
     subject do
-      described_class
-        .new
+      builder
         .set_target_folder(Dir.getwd)
-        .set_template_folder(local_folder)
-        .set_global_template_folder(global_folder)
+        .set_template_folder(app_template_folder)
+        .set_global_template_folder(global_template_folder)
         .process_any_content(**opts)
     end
 
-    let(:local_folder) { File.join(Dir.getwd, 'spec', 'samples', 'app-template') }
-    let(:global_folder) { File.join(Dir.getwd, 'spec', 'samples', 'global-template') }
+    let(:app_template_folder) { File.join(Dir.getwd, 'spec', 'samples', 'app-template') }
+    let(:global_template_folder) { File.join(Dir.getwd, 'spec', 'samples', 'global-template') }
 
     let(:opts) { {} }
 
@@ -334,5 +334,100 @@ RSpec.describe KBuilder::Builder do
 
       it { is_expected.to eq('Global template 2 - Hello Dave') }
     end
+  end
+
+  describe '#add_file' do
+    include_context :use_temp_folder
+
+    before do
+      builder
+        .set_target_folder(@temp_folder)
+        .set_template_folder(app_template_folder)
+        .set_global_template_folder(global_template_folder)
+        .add_file('my-file.txt', **opts)
+    end
+
+    let(:file) { 'my-file.txt' }
+    let(:target_file) { File.join(@temp_folder, file) }
+    let(:opts) { {} }
+
+    context 'file is created' do
+      subject { File.exist?(target_file) }
+
+      it { is_expected.to eq(true) }
+    end
+
+    context 'validate file contents' do
+      subject { File.read(target_file) }
+
+      context 'when no options provided, this is the equivalent of first touch' do
+        it { is_expected.to eq('') }
+      end
+
+      context 'when content: "I am some content"' do
+        let(:opts) { { content: 'I am some content' } }
+
+        it { is_expected.to eq('I am some content') }
+      end
+
+      context 'when content: "Hello {{name}}"' do
+        let(:opts) { { content: 'Hello {{name}}' } }
+
+        it { is_expected.to eq('Hello {{name}}') }
+      end
+
+      context 'when content_file: "some-text.txt"' do
+        let(:opts) { { content_file: File.join(samples_folder, 'some-text.txt') } }
+
+        it { is_expected.to eq('Some text from a text file') }
+      end
+
+      context 'when template: "Hello {{name}}"' do
+        let(:opts) { { template: 'Hello {{name}}', name: 'Dave' } }
+
+        it { is_expected.to eq('Hello Dave') }
+      end
+
+      context 'when template_file: "template1.txt"' do
+        let(:opts) { { template_file: 'template1.txt', name: 'Dave in Local Template' } }
+
+        it { is_expected.to eq('App template 1 - Hello Dave in Local Template') }
+      end
+
+      context 'when template_file: "template2.txt"' do
+        let(:opts) { { template_file: 'template2.txt', name: 'Dave in Global Template' } }
+
+        it { is_expected.to eq('Global template 2 - Hello Dave in Global Template') }
+      end
+    end
+  end
+
+  describe '#prettier' do
+    include_context :use_temp_folder
+    subject do
+      builder
+        .set_target_folder(File.join(Dir.getwd, 'spec', 'samples'))
+        .add_file(content: '{.my-color { color: red;} }')
+        .run_prettier(file)
+    end
+
+    it { puts @temp_folder }
+
+    # context 'process css from source to target' do
+    #   let(:file) { 'make-me-pretty.css' }
+
+    #   fit {
+    #     subject
+
+    #     expected = <<~CSS
+    #     {
+    #       .my-color {
+    #         color: red;
+    #       }
+    #     }
+    #     CSS
+    #   }
+
+    # end
   end
 end
