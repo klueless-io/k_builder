@@ -21,12 +21,17 @@ module KBuilder
     # K-DSL uses data hash, while base configuration uses instance variables
 
     def respond_to_missing?(name, *_args, &_block)
-      puts 'respond_to_missing?'
-      puts "respond_to_missing: #{name}"
+      # puts 'respond_to_missing?'
+      # puts "respond_to_missing: #{name}"
       n = name.to_s
       n = n[0..-2] if n.end_with?('=')
-      # instance_variable_get("@#{n}")
-      my_data.key?(n.to_s) || (@parent.present? && @parent.respond_to?(name, true)) || super
+
+      if n.end_with?('?')
+        super
+      else
+        # This has not been fully tested
+        instance_variable_defined?("@#{n}") || super
+      end
     end
 
     def method_missing(name, *args, &_block)
