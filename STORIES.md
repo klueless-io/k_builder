@@ -1,6 +1,6 @@
 # K Builder
 
-> K Builder provides various fluent builders for initializing applications with different language requirements
+> KBuilder provides various fluent builders and code generators for initializing applications with different language requirements
 
 As a Polyglot Developer, I want to be up and running in any development language with consistency, so I am productive and using best practices
 
