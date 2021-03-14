@@ -1,29 +1,6 @@
 # K Builder
 
-> K Builder provides various fluent builders for initializing applications with different language requirements
-
-## ToDo
-
-- BuildWatcher (as a builder)
-- AppBuilder
-- BaseBuilder
-- WebBuilder
-  - PackageBuilder
-  - Webpack5Builder
-  - ReactBuilder
-  - SlideDeckBuilder
-  - JavscriptBuilder
-- SolutionBuilder
-- DotnetBuilder
-  - C#Console
-  - C#Mvc
-- RubyBuilder
-  - RubyGem
-  - RailsApp
-- PythonBuilder
-- DddBuilder
-  - DddGenerator
-
+> KBuilder provides various fluent builders and code generators for initializing applications with different language requirements
 
 ## Installation
 
@@ -59,12 +36,41 @@ See all [usage examples](./USAGE.md)
 
 ### Basic Example
 
-#### Basic example
+#### Configure and Run
 
-Description for a basic example to be featured in the main README.MD file
+Setup configuration for KBuilder
+
+Generate two files:
+
+1. main.rb is based on class.rb from app_template
+2. configuration.log.txt is based on an inline template
+
+Check out usage.md for more details
 
 ```ruby
-class SomeRuby; end
+usecases_folder = File.join(Dir.getwd, 'spec', 'usecases')
+
+KBuilder.configure do |config|
+  config.template_folder = File.join(usecases_folder, '.app_template')
+  config.global_template_folder = File.join(usecases_folder, '.global_template')
+  config.target_folder = File.join(usecases_folder, '.output')
+end
+
+template = <<~TEXT
+  Configured Template Folder        : {{a}}
+  Configured Global Template Folder : {{b}}
+  Configured Output Folder          : {{c}}
+TEXT
+
+builder = KBuilder::Builder.init
+
+builder.add_file('main.rb', template_file: 'class.rb', name: 'main').add_file(
+  'configuration.log.txt',
+  template: template,
+  a: builder.template_folder,
+  b: builder.global_template_folder,
+  c: builder.target_folder
+)
 ```
 
 ## Development
