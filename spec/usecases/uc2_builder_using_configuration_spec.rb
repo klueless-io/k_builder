@@ -43,7 +43,7 @@ RSpec.describe 'Usecases::BuilderUsingConfiguration' do
                   c: builder.target_folder)
         .add_file('css/index.css',
                   template: '{{#each colors}} .{{.}} { color: {{.}} }  {{/each}}',
-                  colors: ['red', 'blue', 'green'],
+                  colors: %w[red blue green],
                   pretty: true)
     end
   end
