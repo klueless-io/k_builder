@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'k_builder/version'
+require 'k_builder/attach_config'
 require 'k_builder/base_configuration'
 require 'k_builder/configuration'
 require 'k_builder/base_builder'

@@ -10,6 +10,25 @@ class ComplexChild < KBuilder::BaseConfiguration
   end
 end
 
+module KBuilder
+  module ThirdParty
+    class Configuration < BaseConfiguration
+      attach_to(self, KBuilder::BaseConfiguration, :third_party)
+
+      attr_accessor :aaa
+      attr_accessor :bbb
+      attr_accessor :ccc
+
+      def initialize
+        super()
+        @aaa = '1'
+        @bbb = '2'
+        @ccc = '3'
+      end
+    end
+  end
+end
+
 RSpec.describe KBuilder::BaseConfiguration do
   let(:instance) { described_class.new }
 
@@ -25,61 +44,31 @@ RSpec.describe KBuilder::BaseConfiguration do
     end
   end
 
-  context 'meta programming' do
-    context 'simple key/values' do
-      describe '.key' do
-        subject { instance.key }
+  context 'extend configuration via third parties' do
+    describe '#as_hash' do
+      subject { instance.to_hash }
 
-        context 'when no key' do
-          it { expect(subject).to be_nil }
-        end
-
-        describe '#key=' do
-          before { instance.key = 'set via setter' }
-
-          it { expect(subject).to eq('set via setter') }
-        end
-
-        describe '#key(value)' do
-          before { instance.key('set via method') }
-
-          it { expect(subject).to eq('set via method') }
-        end
-      end
+      it { is_expected.to eq({}) }
     end
 
-    context 'complex child configuration' do
-      before do
-        instance.some_child = ComplexChild.new('aa')
-        instance.some_child.ccc = 'cc'
+    describe '#attach_to' do
+      context 'when attachment is not configured' do
+        it { is_expected.not_to respond_to(:some_new_config) }
       end
+      context 'when attachment configured' do
+        it { is_expected.to respond_to(:third_party) }
 
-      subject { instance.some_child }
+        describe '#as_hash' do
+          subject { instance.to_hash }
 
-      it { is_expected.not_to be_nil }
+          it { is_expected.to eq({}) }
 
-      context 'existing attribute initialized via constructor' do
-        subject { instance.some_child.aaa }
+          context 'after accessing third_party' do
+            before { instance.third_party }
 
-        it { is_expected.to eq('aa') }
-      end
-
-      context 'existing attribute not initialized in constructor' do
-        subject { instance.some_child.bbb }
-
-        it { is_expected.to be_nil }
-      end
-
-      context 'unknown attribute set via setter' do
-        subject { instance.some_child.ccc }
-
-        it { is_expected.to eq('cc') }
-      end
-
-      context 'unknown attribute not set' do
-        subject { instance.some_child.ddd }
-
-        it { is_expected.to be_nil }
+            it { is_expected.to eq('third_party' => { 'aaa' => '1', 'bbb' => '2', 'ccc' => '3' }) }
+          end
+        end
       end
     end
   end
