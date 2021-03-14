@@ -1,19 +1,72 @@
 # K Builder
 
-> K Builder provides various fluent builders for initializing applications with different language requirements
+> KBuilder provides various fluent builders and code generators for initializing applications with different language requirements
 
 As a Polyglot Developer, I want to be up and running in any development language with consistency, so I am productive and using best practices
 
 ## Usage
 
-### Sample Classes
+### Configure And Build
 
-#### Simple example
-
-Description for a simple example that shows up in the USAGE.MD
+Print the configuration
 
 ```ruby
-class SomeRuby
-  def initialize; end
-end
+config = KBuilder.configuration.to_hash
+puts JSON.pretty_generate(config)
 ```
+
+```javascript
+{
+  "target_folder": "/Users/name/dev/kgems/k_builder/spec/usecases/.output",
+  "template_folder": "/Users/name/dev/kgems/k_builder/spec/usecases/.app_template",
+  "global_template_folder": "/Users/name/dev/kgems/k_builder/spec/usecases/.global_template"
+}
+```
+
+#### Folder Structure (starting)
+
+Example folder structure for this usecase before running the builder
+
+> Note: app-templates will take preference over global templates
+
+![](_usage_folder_before.png)
+
+#### Run builder
+
+This example builder will add 4 files into the output folder.
+
+1. main.rb is based on class.rb from app_template
+2. person.rb & address.rb are based on model.rb from global_template
+3. configuration.log.txt is based on an inline template
+
+```ruby
+template = <<~TEXT
+  Configured Template Folder        : {{a}}
+  Configured Global Template Folder : {{b}}
+  Configured Output Folder          : {{c}}
+TEXT
+
+builder = KBuilder::Builder.init
+
+builder.add_file('main.rb', template_file: 'class.rb', name: 'main').add_file(
+  'person.rb',
+  template_file: 'model.rb', name: 'person', fields: %i[first_name last_name]
+).add_file(
+  'address.rb',
+  template_file: 'model.rb',
+  name: 'address',
+  fields: %i[street1 street2 post_code state]
+).add_file(
+  'configuration.log.txt',
+  template: template,
+  a: builder.template_folder,
+  b: builder.global_template_folder,
+  c: builder.target_folder
+).add_file('css/index.css', template_file: 'class.rb', colors: 'main')
+```
+
+#### Folder Structure (after)
+
+Folder structure after running the builder
+
+![](_usage_folder_after.png)
