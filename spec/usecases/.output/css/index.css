@@ -1,8 +1,9 @@
-# frozen_string_literal: true
-
-# Application Specific Ruby Class Template
-class 
-  def initialize()
-    # Do something
-  end
-end
+.red {
+  color: red;
+}
+.blue {
+  color: blue;
+}
+.green {
+  color: green;
+}

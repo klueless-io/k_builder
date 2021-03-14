@@ -70,7 +70,11 @@ builder
             a: builder.template_folder,
             b: builder.global_template_folder,
             c: builder.target_folder)
-  .add_file('css/index.css', template_file: 'class.rb', colors: 'main')
+  .add_file('css/index.css',
+            template: '{{#each colors}} .{{.}} { color: {{.}} }  {{/each}}',
+            colors: ['red', 'blue', 'green'],
+            pretty: true)
+
 ```
 
 #### Folder Structure (after)
@@ -78,3 +82,23 @@ builder
 Folder structure after running the builder
 
 ![](_usage_folder_after.png)
+
+#### main.rb
+
+![main.rb](_out1.png)
+
+#### person.rb
+
+![](_out2.png)
+
+#### address.rb
+
+![person.rb](_out3.png)
+
+#### configuration.log.txt
+
+![configuration.log.txt](_out4.png)
+
+#### css/index.css
+
+![css/index.css](_out5.png)
