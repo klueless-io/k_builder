@@ -1,4 +1,3 @@
 Configured Template Folder        : /Users/davidcruwys/dev/kgems/k_builder/spec/usecases/.app_template
 Configured Global Template Folder : /Users/davidcruwys/dev/kgems/k_builder/spec/usecases/.global_template
 Configured Output Folder          : /Users/davidcruwys/dev/kgems/k_builder/spec/usecases/.output
-
