@@ -22,7 +22,6 @@ RSpec.describe 'Usecases::BuilderUsingConfiguration' do
         Configured Template Folder        : {{a}}
         Configured Global Template Folder : {{b}}
         Configured Output Folder          : {{c}}
-
       TEXT
 
       builder = KBuilder::Builder.init

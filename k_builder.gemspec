@@ -13,7 +13,7 @@ Gem::Specification.new do |spec|
   spec.description            = <<-TEXT
     K Builder provides various fluent builders for initializing applications with different language requirements
   TEXT
-  spec.homepage               = 'http://appydave.com/gems/k-builder'
+  spec.homepage               = 'http://appydave.com' # /gems/k-builder'
   spec.license                = 'MIT'
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
