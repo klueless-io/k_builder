@@ -36,7 +36,7 @@ Example folder structure for this usecase before running the builder
 
 > Note: app-templates will take preference over global templates
 
-![](_usage_folder_before.png)
+![](usage/_usage_folder_before.png)
 
 #### Run builder
 
@@ -81,24 +81,24 @@ builder
 
 Folder structure after running the builder
 
-![](_usage_folder_after.png)
+![](usage/_usage_folder_after.png)
 
 #### main.rb
 
-![main.rb](_out1.png)
+![main.rb](usage/_out1.png)
 
 #### person.rb
 
-![](_out2.png)
+![](usage/_out2.png)
 
 #### address.rb
 
-![person.rb](_out3.png)
+![person.rb](usage/_out3.png)
 
 #### configuration.log.txt
 
-![configuration.log.txt](_out4.png)
+![configuration.log.txt](usage/_out4.png)
 
 #### css/index.css
 
-![css/index.css](_out5.png)
+![css/index.css](usage/_out5.png)
