@@ -31,7 +31,7 @@ module KBuilder
       end
     end
 
-    # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
     def struct_to_hash(data)
       # No test yet
       if data.is_a?(Array)
@@ -53,7 +53,7 @@ module KBuilder
         end
       end
     end
-    # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 
     def clean_symbol(value)
       return value if value.nil?
