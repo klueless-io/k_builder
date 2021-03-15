@@ -40,11 +40,13 @@ module KBuilder
 
       data.each_pair.with_object({}) do |(key, value), hash|
         case value
-        when OpenStruct
+        when OpenStruct, Struct, Hash
           hash[key] = struct_to_hash(value)
         when Array
           # No test yet
-          values = value.map { |v| v.is_a?(OpenStruct) ? struct_to_hash(v) : v }
+          values = value.map do |v|
+            v.is_a?(OpenStruct) || v.is_a?(Struct) || v.is_a?(Hash) ? struct_to_hash(v) : v
+          end
           hash[key] = values
         else
           hash[key] = value
