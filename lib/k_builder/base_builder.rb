@@ -47,7 +47,7 @@ module KBuilder
       @hash = {}
 
       unless configuration.nil?
-        raise KBuilder::StandardError, 'Unknown configuration object' unless configuration.is_a?(Hash)
+        raise KBuilder::Error, 'Unknown configuration object' unless configuration.is_a?(Hash)
 
         hash.merge!(configuration)
       end

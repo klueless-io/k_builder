@@ -1,1 +1,1 @@
-Global template 2 - Hello {{name}}
+Domain template 2 - Hello {{name}}
