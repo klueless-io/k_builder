@@ -3,6 +3,7 @@
 RSpec.describe KBuilder::LayeredFolders do
   let(:instance) { described_class.new }
   let(:samples_folder) { File.join(Dir.getwd, 'spec', 'samples') }
+  let(:tilda_folder) { '~/x' }
   let(:app_template_folder) { File.join(samples_folder, 'app-template') }
   let(:domain_template_folder) { File.join(samples_folder, 'domain-template') }
   let(:global_template_folder) { File.join(samples_folder, 'global-template') }
@@ -21,6 +22,7 @@ RSpec.describe KBuilder::LayeredFolders do
 
   describe '#add' do
     before do
+      instance.add(tilda_folder)
       instance.add(global_template_folder)
       instance.add(domain_template_folder)
       instance.add(app_template_folder)
@@ -30,7 +32,16 @@ RSpec.describe KBuilder::LayeredFolders do
       subject { instance.folders }
 
       it { is_expected.not_to be_empty }
-      it { is_expected.to have_attributes(count: 3) }
+      it { is_expected.to have_attributes(count: 4) }
+      it do
+        is_expected
+          .to include(
+            File.expand_path(tilda_folder),
+            app_template_folder,
+            domain_template_folder,
+            global_template_folder
+          )
+      end
     end
 
     describe '#find_file_folder' do
