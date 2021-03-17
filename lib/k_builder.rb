@@ -7,6 +7,7 @@ require 'k_builder/builder'
 require 'k_builder/configuration'
 require 'k_builder/data_helper'
 require 'k_builder/layered_folders'
+require 'k_builder/named_folders'
 
 require 'handlebars/helpers/template'
 
