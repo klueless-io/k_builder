@@ -1,0 +1,1 @@
+Global template 3 - Hello {{name}}

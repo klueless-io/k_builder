@@ -148,16 +148,19 @@ module KBuilder
 
     # Gets a target_file relative to target folder
     def target_file(file)
+      # Need support for when file is absolute
       File.join(target_folder, file)
     end
 
     # Gets a template_file relative to the template folder
     def template_file(file)
+      # Need support for when file is absolute
       File.join(template_folder, file)
     end
 
     # Gets a global_template_file relative to the global template folder
     def global_template_file(file)
+      # Need support for when file is absolute
       File.join(global_template_folder, file)
     end
 
