@@ -68,5 +68,13 @@ module KBuilder
     end
     # Get a file name using the lookup folder key and the file name or array of sub-paths plus filename
     alias get_filename join
+
+    def folder_keys
+      @folders.keys
+    end
+
+    def to_h
+      @folders
+    end
   end
 end

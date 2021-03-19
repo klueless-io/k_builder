@@ -32,8 +32,8 @@ end
 RSpec.describe KBuilder::BaseConfiguration do
   let(:instance) { described_class.new }
 
-  describe '#as_hash' do
-    subject { instance.to_hash }
+  describe '#to_h' do
+    subject { instance.to_h }
 
     it { is_expected.to eq({}) }
 
@@ -45,8 +45,8 @@ RSpec.describe KBuilder::BaseConfiguration do
   end
 
   context 'extend configuration via third parties' do
-    describe '#as_hash' do
-      subject { instance.to_hash }
+    describe '#to_h' do
+      subject { instance.to_h }
 
       it { is_expected.to eq({}) }
     end
@@ -58,8 +58,8 @@ RSpec.describe KBuilder::BaseConfiguration do
       context 'when attachment configured' do
         it { is_expected.to respond_to(:third_party) }
 
-        describe '#as_hash' do
-          subject { instance.to_hash }
+        describe '#to_h' do
+          subject { instance.to_h }
 
           it { is_expected.to eq({}) }
 

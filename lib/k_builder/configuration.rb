@@ -21,23 +21,32 @@ module KBuilder
 
   # Configuration class
   class Configuration < BaseConfiguration
-    attr_accessor :target_folder
-    attr_accessor :template_folder
-    attr_accessor :global_template_folder
+    attr_accessor :target_folders
+    attr_accessor :template_folders
 
     def initialize
       super
-      @target_folder = Dir.getwd
-      @template_folder = File.join(Dir.getwd, '.templates')
-      @global_template_folder = nil
+      # @target_folder = Dir.getwd
+      # @template_folder = File.join(Dir.getwd, '.templates')
+      # @global_template_folder = nil
+      @target_folders = NamedFolders.new
+      @template_folders = LayeredFolders.new
     end
 
     def debug
       puts '-' * 120
       puts 'kbuilder base configuration'
-      kv 'target_folder'         , target_folder
-      kv 'template_folder'       , template_folder
-      kv 'global_template_folder', global_template_folder
+
+      puts 'target_folders'
+      target_folders.folders.keys.each do |key|
+        folder = target_folders.folders[key]
+        kv key.to_s, folder
+      end
+
+      puts 'template folders (search order)'
+      template_folders.folders.each do |folder|
+        puts "  #{folder}"
+      end
     end
   end
 end

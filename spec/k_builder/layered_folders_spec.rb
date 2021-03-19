@@ -7,6 +7,7 @@ RSpec.describe KBuilder::LayeredFolders do
   let(:app_template_folder) { File.join(samples_folder, 'app-template') }
   let(:domain_template_folder) { File.join(samples_folder, 'domain-template') }
   let(:global_template_folder) { File.join(samples_folder, 'global-template') }
+  let(:global_template_shim_folder) { File.join(samples_folder, 'global-shim-template') }
 
   describe '#initialize' do
     subject { instance }
@@ -18,30 +19,44 @@ RSpec.describe KBuilder::LayeredFolders do
 
       it { is_expected.to be_empty }
     end
+
+    describe '.ordered_folders' do
+      subject { instance.ordered_folders }
+
+      it { is_expected.to be_empty }
+    end
   end
 
   describe '#add' do
     before do
-      instance.add(tilda_folder)
-      instance.add(global_template_folder)
-      instance.add(domain_template_folder)
-      instance.add(app_template_folder)
+      instance.add(:fallback  , tilda_folder)
+      instance.add(:global    , global_template_folder)
+      instance.add(:domain    , domain_template_folder)
+      instance.add(:app       , app_template_folder)
     end
 
-    context '.folders' do
-      subject { instance.folders }
+    context '.ordered_folders' do
+      subject { instance.ordered_folders }
 
       it { is_expected.not_to be_empty }
       it { is_expected.to have_attributes(count: 4) }
       it do
         is_expected
           .to include(
-            File.expand_path(tilda_folder),
             app_template_folder,
             domain_template_folder,
-            global_template_folder
+            global_template_folder,
+            File.expand_path(tilda_folder)
           )
       end
+    end
+
+    context '.ordered_keys' do
+      subject { instance.ordered_keys }
+
+      it { is_expected.not_to be_empty }
+      it { is_expected.to have_attributes(count: 4) }
+      it { is_expected.to eq([:app, :domain, :global, :fallback]) }
     end
 
     describe '#find_file_folder' do
@@ -109,6 +124,19 @@ RSpec.describe KBuilder::LayeredFolders do
         let(:file_parts) { ['abc', 'xyz', 'deep-template.txt'] }
 
         it { is_expected.to end_with('global-template/abc/xyz/deep-template.txt') }
+      end
+    end
+
+    describe '#to_h' do
+      subject { instance.to_h }
+
+      context 'add some folders' do
+        it do 
+          is_expected
+            .to  include(:ordered => include(:keys => instance.ordered_keys))
+            .and include(:ordered => include(:folders => instance.ordered_folders))
+            .and include(instance.folders)
+        end
       end
     end
   end
