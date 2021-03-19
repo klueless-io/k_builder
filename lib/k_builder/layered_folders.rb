@@ -18,7 +18,7 @@ module KBuilder
   # to be stored with easy to remember names/alias's.
   #
   # Where they differ is that they are retrieved in preferential search order that is
-  # by default (First In, Last Out) priority aka a Stack (Last In, First Out) or 
+  # by default (First In, Last Out) priority aka a Stack (Last In, First Out) or
   # optionally over ridden via the search_order method
   #
   # Layered folders makes sense for use with template files and source data/model
@@ -43,7 +43,7 @@ module KBuilder
   #   folders.find_file_folder('abc/xyz/deep-template.txt')
   #
   #   # If an additional folder is added, say in child configuration that is designed
-  #   # to override some of the global templates, then you can run a search_order 
+  #   # to override some of the global templates, then you can run a search_order
   #   # method to re-order the templates
   #
   #   folders.add(:global_shim  , '~/global_templates_shim')
@@ -59,6 +59,13 @@ module KBuilder
 
       @ordered_keys = []
       @ordered_folders = []
+    end
+
+    def initialize_copy(orig)
+      super(orig)
+
+      @ordered_keys = orig.ordered_keys.clone
+      @ordered_folders = orig.ordered_folders.clone
     end
 
     def add(folder_key, folder)
@@ -86,7 +93,7 @@ module KBuilder
     end
 
     def to_h
-      { 
+      {
         ordered: {
           keys: ordered_keys,
           folders: ordered_folders

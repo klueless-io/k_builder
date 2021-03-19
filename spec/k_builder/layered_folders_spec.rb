@@ -3,7 +3,8 @@
 RSpec.describe KBuilder::LayeredFolders do
   let(:instance) { described_class.new }
   let(:samples_folder) { File.join(Dir.getwd, 'spec', 'samples') }
-  let(:tilda_folder) { '~/x' }
+  let(:fallback_folder) { '~/x' }
+  let(:expected_fallback_folder) { File.expand_path(fallback_folder) }
   let(:app_template_folder) { File.join(samples_folder, 'app-template') }
   let(:domain_template_folder) { File.join(samples_folder, 'domain-template') }
   let(:global_template_folder) { File.join(samples_folder, 'global-template') }
@@ -29,7 +30,7 @@ RSpec.describe KBuilder::LayeredFolders do
 
   describe '#add' do
     before do
-      instance.add(:fallback  , tilda_folder)
+      instance.add(:fallback  , fallback_folder)
       instance.add(:global    , global_template_folder)
       instance.add(:domain    , domain_template_folder)
       instance.add(:app       , app_template_folder)
@@ -46,7 +47,7 @@ RSpec.describe KBuilder::LayeredFolders do
             app_template_folder,
             domain_template_folder,
             global_template_folder,
-            File.expand_path(tilda_folder)
+            expected_fallback_folder
           )
       end
     end
@@ -56,7 +57,7 @@ RSpec.describe KBuilder::LayeredFolders do
 
       it { is_expected.not_to be_empty }
       it { is_expected.to have_attributes(count: 4) }
-      it { is_expected.to eq([:app, :domain, :global, :fallback]) }
+      it { is_expected.to eq(%i[app domain global fallback]) }
     end
 
     describe '#find_file_folder' do
@@ -127,14 +128,92 @@ RSpec.describe KBuilder::LayeredFolders do
       end
     end
 
+    describe '#clone' do
+      let(:copy) { instance.clone }
+
+      before do
+        copy.add(:custom, '/custom')
+      end
+
+      context 'original' do
+        let(:target) { instance }
+
+        context '.count' do
+          subject { target.folders.count }
+
+          it { is_expected.to eq(4) }
+        end
+
+        context '.folders' do
+          subject { target.folders }
+
+          it { is_expected.to have_key(:app).and have_key(:domain).and have_key(:global).and have_key(:fallback) }
+          it { is_expected.not_to have_key(:custom) }
+        end
+
+        context '.ordered_keys' do
+          subject { target.ordered_keys }
+
+          it { is_expected.to eq(%i[app domain global fallback]) }
+        end
+
+        context '.ordered_folders' do
+          subject { target.ordered_folders }
+
+          it do
+            is_expected
+              .to  include(app_template_folder)
+              .and include(domain_template_folder)
+              .and include(global_template_folder)
+              .and include(expected_fallback_folder)
+          end
+        end
+      end
+
+      context 'copy' do
+        let(:target) { copy }
+
+        context '.count' do
+          subject { target.folders.count }
+
+          it { is_expected.to eq(5) }
+        end
+
+        context '.folders' do
+          subject { target.folders }
+
+          it { is_expected.to have_key(:app).and have_key(:domain).and have_key(:global).and have_key(:fallback).and have_key(:custom) }
+        end
+
+        context '.ordered_keys' do
+          subject { target.ordered_keys }
+
+          it { is_expected.to eq(%i[custom app domain global fallback]) }
+        end
+
+        context '.ordered_folders' do
+          subject { target.ordered_folders }
+
+          it do
+            is_expected
+              .to  include('/custom')
+              .and include(app_template_folder)
+              .and include(domain_template_folder)
+              .and include(global_template_folder)
+              .and include(expected_fallback_folder)
+          end
+        end
+      end
+    end
+
     describe '#to_h' do
       subject { instance.to_h }
 
       context 'add some folders' do
-        it do 
+        it do
           is_expected
-            .to  include(:ordered => include(:keys => instance.ordered_keys))
-            .and include(:ordered => include(:folders => instance.ordered_folders))
+            .to  include(ordered: include(keys: instance.ordered_keys))
+            .and include(ordered: include(folders: instance.ordered_folders))
             .and include(instance.folders)
         end
       end
