@@ -33,6 +33,13 @@ module KBuilder
       @template_folders = LayeredFolders.new
     end
 
+    def initialize_copy(orig)
+      super(orig)
+
+      @target_folders = orig.target_folders.clone
+      @template_folders = orig.template_folders.clone
+    end
+
     # rubocop:disable Metrics/AbcSize
     def debug
       puts '-' * 120
