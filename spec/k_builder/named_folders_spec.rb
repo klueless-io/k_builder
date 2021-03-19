@@ -145,7 +145,51 @@ RSpec.describe KBuilder::NamedFolders do
         instance.add(:webpack, instance.join(:app, 'config'))
       end
 
-      it { is_expected.to eq([:app, :webpack]) }
+      it { is_expected.to eq(%i[app webpack]) }
+    end
+  end
+
+  describe '#clone' do
+    let(:copy) { instance.clone }
+
+    before do
+      instance.add(:app, target_folder)
+      instance.add(:webpack, instance.join(:app, 'config'))
+
+      copy.add(:custom, '/custom')
+    end
+
+    context 'original' do
+      let(:target) { instance }
+
+      context '.count' do
+        subject { target.folders.count }
+
+        it { is_expected.to eq(2) }
+      end
+
+      context '.folders' do
+        subject { target.folders }
+
+        it { is_expected.to have_key(:app).and have_key(:webpack) }
+        it { is_expected.not_to have_key(:custom) }
+      end
+    end
+
+    context 'copy' do
+      let(:target) { copy }
+
+      context '.count' do
+        subject { target.folders.count }
+
+        it { is_expected.to eq(3) }
+      end
+
+      context '.folders' do
+        subject { target.folders }
+
+        it { is_expected.to have_key(:app).and have_key(:webpack).and have_key(:custom) }
+      end
     end
   end
 
@@ -158,10 +202,10 @@ RSpec.describe KBuilder::NamedFolders do
         instance.add(:webpack, instance.join(:app, 'config'))
       end
 
-      it do 
+      it do
         is_expected
-          .to  include(:app => "/Users/davidcruwys/dev/kgems/k_builder/spec/samples/target")
-          .and include(:webpack => "/Users/davidcruwys/dev/kgems/k_builder/spec/samples/target/config")
+          .to  include(app: '/Users/davidcruwys/dev/kgems/k_builder/spec/samples/target')
+          .and include(webpack: '/Users/davidcruwys/dev/kgems/k_builder/spec/samples/target/config')
       end
     end
   end

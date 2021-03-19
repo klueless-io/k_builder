@@ -46,10 +46,10 @@ module KBuilder
     # Anything container that is not a regular class
     def complex_type?(value)
       value.is_a?(Array) ||
-      value.is_a?(Hash) ||
-      value.is_a?(Struct) ||
-      value.is_a?(OpenStruct) ||
-      value.respond_to?(:to_h)
+        value.is_a?(Hash) ||
+        value.is_a?(Struct) ||
+        value.is_a?(OpenStruct) ||
+        value.respond_to?(:to_h)
     end
 
     def kv(name, value)

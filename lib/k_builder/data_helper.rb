@@ -38,9 +38,7 @@ module KBuilder
         return data.map { |v| v.is_a?(OpenStruct) ? struct_to_hash(v) : v }
       end
 
-      if !data.is_a?(Hash) && data.respond_to?(:to_h)
-        return struct_to_hash(data.to_h)
-      end
+      return struct_to_hash(data.to_h) if !data.is_a?(Hash) && data.respond_to?(:to_h)
 
       data.each_pair.with_object({}) do |(key, value), hash|
         case value

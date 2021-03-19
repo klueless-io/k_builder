@@ -35,7 +35,6 @@ RSpec.describe KBuilder::Builder do
     it { is_expected.to be_a(described_class) }
 
     describe '.hash' do
-
       context 'via custom hash configuration' do
         subject { described_class.init(config).hash }
 
@@ -69,7 +68,7 @@ RSpec.describe KBuilder::Builder do
             lambda { |config|
             }
           end
-    
+
           it do
             is_expected
               .to  be_a(Hash)
@@ -83,13 +82,13 @@ RSpec.describe KBuilder::Builder do
             lambda { |config|
               config.target_folders.add(:app, target_folder)
               config.target_folders.add(:documentation, target_documentation_folder)
-      
+
               config.template_folders.add(global_template_folder)
               config.template_folders.add(global_template_folder)
               config.template_folders.add(app_template_folder)
             }
           end
-    
+
           it do
             is_expected
               .to  be_a(Hash)
@@ -98,7 +97,7 @@ RSpec.describe KBuilder::Builder do
           end
         end
       end
-      
+
       context 'with custom configuration via hash' do
         context 'when empty' do
           let(:config) { {} }
@@ -108,31 +107,30 @@ RSpec.describe KBuilder::Builder do
 
         context 'when configured with nil' do
           let(:config) do
-              {
-                "target_folders" => {
-                  "src" => "/Users/davidcruwys/my-target-folder1",
-                  "dst" => "/Users/davidcruwys/my-target-folder2"
-                },
-                "template_folders" => [
-                  "/Users/davidcruwys/my-template-folder",
-                  "/Users/davidcruwys/my-template-folder-domain",
-                  "/Users/davidcruwys/my-template-folder-global"
-                ]
-              }
+            {
+              'target_folders' => {
+                'src' => '/Users/davidcruwys/my-target-folder1',
+                'dst' => '/Users/davidcruwys/my-target-folder2'
+              },
+              'template_folders' => [
+                '/Users/davidcruwys/my-template-folder',
+                '/Users/davidcruwys/my-template-folder-domain',
+                '/Users/davidcruwys/my-template-folder-global'
+              ]
+            }
           end
           it {
             puts JSON.pretty_generate(subject)
-      
           }
-      
+
           it do
             puts JSON.pretty_generate(subject)
             is_expected
               .to  be_a(Hash)
               .and include('target_folders' => include(src: File.expand_path(custom_target_folder1),
                                                        dst: File.expand_path(custom_target_folder2)))
-              # .and include('template_folder' => be_nil)
-              # .and include('global_template_folder' => be_nil)
+            # .and include('template_folder' => be_nil)
+            # .and include('global_template_folder' => be_nil)
           end
         end
 

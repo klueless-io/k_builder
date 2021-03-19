@@ -11,19 +11,17 @@ module KBuilder
       super(configuration)
     end
 
-    # rubocop:disable Metrics/AbcSize
     def after_new
       # Generally loaded from configuration, if missing then initialize
       hash['target_folders'] = {} if hash['target_folders'].nil?
       hash['template_folders'] = [] if hash['template_folders'].nil?
-      
+
       # self.target_folders = hash['target_folders'] unless hash['target_folders'].nil?
       # self.target_folders = hash['target_folders'] unless hash['target_folders'].nil?
       # self.target_folder = hash['target_folder'] unless hash['target_folder'].nil?
       # self.template_folder = hash['template_folder'] unless hash['template_folder'].nil?
       # self.global_template_folder = hash['global_template_folder'] unless hash['global_template_folder'].nil?
     end
-    # rubocop:enable Metrics/AbcSize
 
     # Return an array of symbols to represent the fluent setter methods in this builder.
     def builder_setter_methods
@@ -81,7 +79,7 @@ module KBuilder
 
     # Fluent setter for target folder
     def add_target_folder(value)
-      self.target_folders.add(value)
+      target_folders.add(value)
 
       self
     end

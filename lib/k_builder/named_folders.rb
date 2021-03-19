@@ -40,6 +40,12 @@ module KBuilder
       @folders = {}
     end
 
+    def initialize_copy(orig)
+      super(orig)
+
+      @folders = orig.folders.clone
+    end
+
     def add(folder_key, folder)
       # get a predefined folder by symbol
       if folder.is_a?(Symbol)
