@@ -4,9 +4,6 @@ module KBuilder
   # Base builder defines builder methods, build method and configuration
   class Builder < KBuilder::BaseBuilder
     # builder_setter_methods = %w[].freeze
-    # target_folder
-    # template_folder
-    # global_template_folder
 
     def initialize(configuration = nil)
       configuration = KBuilder.configuration.to_hash if configuration.nil?
@@ -16,10 +13,15 @@ module KBuilder
 
     # rubocop:disable Metrics/AbcSize
     def after_new
-      # ensure that any configured folders are expanded
-      self.target_folder = hash['target_folder'] unless hash['target_folder'].nil?
-      self.template_folder = hash['template_folder'] unless hash['template_folder'].nil?
-      self.global_template_folder = hash['global_template_folder'] unless hash['global_template_folder'].nil?
+      # Generally loaded from configuration, if missing then initialize
+      hash['target_folders'] = {} if hash['target_folders'].nil?
+      hash['template_folders'] = [] if hash['template_folders'].nil?
+      
+      # self.target_folders = hash['target_folders'] unless hash['target_folders'].nil?
+      # self.target_folders = hash['target_folders'] unless hash['target_folders'].nil?
+      # self.target_folder = hash['target_folder'] unless hash['target_folder'].nil?
+      # self.template_folder = hash['template_folder'] unless hash['template_folder'].nil?
+      # self.global_template_folder = hash['global_template_folder'] unless hash['global_template_folder'].nil?
     end
     # rubocop:enable Metrics/AbcSize
 
@@ -78,8 +80,8 @@ module KBuilder
     # ----------------------------------------------------------------------
 
     # Fluent setter for target folder
-    def set_target_folder(value)
-      self.target_folder = value
+    def add_target_folder(value)
+      self.target_folders.add(value)
 
       self
     end

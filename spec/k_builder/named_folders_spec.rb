@@ -4,7 +4,6 @@ RSpec.describe KBuilder::NamedFolders do
   let(:instance) { described_class.new }
   let(:samples_folder) { File.join(Dir.getwd, 'spec', 'samples') }
   let(:target_folder) { File.join(samples_folder, 'target') }
-  let(:target_documentation_folder) { File.join(samples_folder, 'target-documention') }
   let(:webpack_folder) { File.join(target_folder, 'config') }
   let(:slide_folder) { '~/slides' }
 
@@ -21,8 +20,9 @@ RSpec.describe KBuilder::NamedFolders do
   end
 
   describe '#add' do
-      # instance.add(domain_template_folder)
-      # instance.add(app_template_folder)
+    subject { instance.add(:app, slide_folder) }
+
+    it { is_expected.to eq(File.expand_path(slide_folder)) }
 
     describe '.folders' do
       subject { instance.folders }
@@ -31,7 +31,7 @@ RSpec.describe KBuilder::NamedFolders do
         before { instance.add(:app, target_folder) }
 
         # May want to support :default or :root here
-        it { is_expected.to include(app: target_folder)}
+        it { is_expected.to include(app: target_folder) }
 
         context ':package folder is aliased to :app folder' do
           before { instance.add(:package, :app) }
@@ -63,12 +63,12 @@ RSpec.describe KBuilder::NamedFolders do
       end
     end
 
-  #   folders = NamedFolders.new
-  #   folders.add(:csharp       , '~/dev/csharp/cool-project')
-  #   folders.add(:package_json , :csharp)
-  #   folders.add(:webpack      , folders.join(:csharp, 'config'))
-  #   folders.add(:builder      , folders.join(:csharp, 'builder'))
-  #   folders.add(:slides       , '~/doc/csharp/cool-project')
+    #   folders = NamedFolders.new
+    #   folders.add(:csharp       , '~/dev/csharp/cool-project')
+    #   folders.add(:package_json , :csharp)
+    #   folders.add(:webpack      , folders.join(:csharp, 'config'))
+    #   folders.add(:builder      , folders.join(:csharp, 'builder'))
+    #   folders.add(:slides       , '~/doc/csharp/cool-project')
 
     # context '.folders' do
     #   subject { instance.folders }
@@ -93,12 +93,12 @@ RSpec.describe KBuilder::NamedFolders do
 
     context 'join folder' do
       subject { instance.join(:app, 'config') }
-      
+
       it { is_expected.to eq(File.join(target_folder, 'config')) }
 
       context 'join multiple subfolders' do
         subject { instance.join(:app, 'config', 'more') }
-        
+
         it { is_expected.to eq(File.join(target_folder, 'config', 'more')) }
       end
     end
@@ -109,12 +109,12 @@ RSpec.describe KBuilder::NamedFolders do
     before { instance.add(:app, target_folder) }
     context 'get_filename folder' do
       subject { instance.get_filename(:app, 'output.txt') }
-      
+
       it { is_expected.to eq(File.join(target_folder, 'output.txt')) }
 
       context 'get_filename multiple subfolders' do
         subject { instance.get_filename(:app, 'config', 'output.txt') }
-        
+
         it { is_expected.to eq(File.join(target_folder, 'config', 'output.txt')) }
       end
     end
@@ -125,14 +125,44 @@ RSpec.describe KBuilder::NamedFolders do
 
     context 'get registered folder' do
       subject { instance.get(:app) }
-      
+
       it { is_expected.to eq(target_folder) }
     end
 
     context 'get unknown folder' do
       subject { instance.get(:xxx) }
-      
-      it { expect { subject }.to raise_error(KBuilder::Error, "Folder not found, this folder key not found: xxx") }
+
+      it { expect { subject }.to raise_error(KBuilder::Error, 'Folder not found, this folder key not found: xxx') }
+    end
+  end
+
+  describe '.folder_keys' do
+    subject { instance.folder_keys }
+
+    context 'add some folders' do
+      before do
+        instance.add(:app, target_folder)
+        instance.add(:webpack, instance.join(:app, 'config'))
+      end
+
+      it { is_expected.to eq([:app, :webpack]) }
+    end
+  end
+
+  describe '#to_h' do
+    subject { instance.to_h }
+
+    context 'add some folders' do
+      before do
+        instance.add(:app, target_folder)
+        instance.add(:webpack, instance.join(:app, 'config'))
+      end
+
+      it do 
+        is_expected
+          .to  include(:app => "/Users/davidcruwys/dev/kgems/k_builder/spec/samples/target")
+          .and include(:webpack => "/Users/davidcruwys/dev/kgems/k_builder/spec/samples/target/config")
+      end
     end
   end
 end
