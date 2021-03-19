@@ -6,7 +6,7 @@ module KBuilder
     # builder_setter_methods = %w[].freeze
 
     def initialize(configuration = nil)
-      configuration = KBuilder.configuration.to_hash if configuration.nil?
+      configuration = KBuilder.configuration if configuration.nil?
 
       super(configuration)
     end

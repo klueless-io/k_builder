@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe KBuilder::BaseBuilder do
+  let(:instance) { described_class.new }
   let(:builder_module) { KBuilder }
   let(:cfg) { ->(config) {} }
 
@@ -12,15 +13,22 @@ RSpec.describe KBuilder::BaseBuilder do
   end
 
   describe '#initialize' do
-    subject { described_class.new }
+    subject { instance }
 
-    it { expect { subject }.to raise_error NotImplementedError }
+    it { is_expected.not_to be_nil }
+
+    context '.configuration' do
+      subject { instance.configuration }
+
+      it { is_expected.not_to be_nil }
+    end
   end
+  # it { expect { subject }.to raise_error NotImplementedError }
 
   describe '#init' do
     subject { described_class.init }
 
-    it { expect { subject }.to raise_error NotImplementedError }
+    it { is_expected.not_to be_nil }
   end
 
   describe '#build' do
