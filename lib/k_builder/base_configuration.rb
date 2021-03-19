@@ -22,11 +22,7 @@ module KBuilder
       instance_variables.each do |var|
         value = instance_variable_get(var)
 
-        if complex_type?(value)
-          value = KBuilder.data.struct_to_hash(value)
-        elsif value.is_a?(KBuilder::BaseConfiguration)
-          value = value.to_hash
-        end
+        value = KBuilder.data.struct_to_hash(value) if complex_type?(value)
 
         hash[var.to_s.delete('@')] = value
       end

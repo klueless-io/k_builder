@@ -8,7 +8,7 @@ module KBuilder
   #             Setter methods (are NOT fluent) can be created as needed
   #             these methods would not be prefixed with the set_
   class BaseBuilder
-    attr_reader :hash
+    attr_reader :configuration
 
     # Factory method that provides a builder for a specified structure
     # runs through a configuration block and then builds the final structure
@@ -44,13 +44,9 @@ module KBuilder
 
     # assigns a builder hash and defines builder methods
     def initialize(configuration = nil)
-      @hash = {}
+      configuration = KBuilder.configuration if configuration.nil?
 
-      unless configuration.nil?
-        raise KBuilder::Error, 'Unknown configuration object' unless configuration.is_a?(Hash)
-
-        hash.merge!(configuration)
-      end
+      @configuration = configuration
 
       define_builder_setter_methods
     end
@@ -60,14 +56,14 @@ module KBuilder
     #
     # Abstract method
     def builder_setter_methods
-      raise NotImplementedError
+      []
     end
 
     # @return [Hash/StrongType] Returns data object, can be a hash
     #                           or strong typed object that you
     #                           have wrapped around the hash
     def build
-      hash
+      raise NotImplementedError
     end
 
     # TODO
