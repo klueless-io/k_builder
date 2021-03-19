@@ -33,20 +33,22 @@ module KBuilder
       @template_folders = LayeredFolders.new
     end
 
+    # rubocop:disable Metrics/AbcSize
     def debug
       puts '-' * 120
       puts 'kbuilder base configuration'
 
       puts 'target_folders'
-      target_folders.folders.keys.each do |key|
+      target_folders.folders.each_key do |key|
         folder = target_folders.folders[key]
         kv key.to_s, folder
       end
 
       puts 'template folders (search order)'
-      template_folders.folders.each do |folder|
-        puts "  #{folder}"
+      template_folders.ordered_folders.each do |folder|
+        puts folder.to_s
       end
     end
+    # rubocop:enable Metrics/AbcSize
   end
 end
