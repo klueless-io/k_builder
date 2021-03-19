@@ -113,7 +113,7 @@ RSpec.describe KBuilder::Configuration do
   end
 
   describe '#clone' do
-    let(:new_instance) { instance.clone }
+    let(:copy) { instance.clone }
 
     let(:cfg) do
       lambda { |config|
@@ -127,37 +127,109 @@ RSpec.describe KBuilder::Configuration do
     end
 
     before do
-      new_instance.target_folders.add(:custom, '/custom')
-      # new_instance.template_folders.add(:more, "/more")
+      copy.target_folders.add(:custom, '/custom')
+      copy.template_folders.add(:more, '/more')
     end
 
     context 'original' do
-      context '.count' do
-        subject { instance.target_folders.folders.count }
+      let(:target) { instance }
 
-        fit { is_expected.to eq(2) }
+      context '.target_folders' do
+        context '.count' do
+          subject { target.target_folders.folders.count }
+
+          it { is_expected.to eq(2) }
+        end
+
+        context '.folders' do
+          subject { target.target_folders.folders }
+
+          it { is_expected.to have_key(:src).and have_key(:dst) }
+          it { is_expected.not_to have_key(:custom) }
+        end
+      end
+
+      context '.template_folders' do
+        context '.count' do
+          subject { target.template_folders.folders.count }
+
+          it { is_expected.to eq(3) }
+        end
+
+        context '.folders' do
+          subject { target.template_folders.folders }
+
+          it { is_expected.to have_key(:global).and have_key(:domain).and have_key(:app) }
+          it { is_expected.not_to have_key(:more) }
+        end
+
+        context '.ordered_keys' do
+          subject { target.template_folders.ordered_keys }
+
+          it { is_expected.to eq(%i[app domain global]) }
+        end
+
+        context '.ordered_folders' do
+          subject { target.template_folders.ordered_folders }
+
+          it do
+            is_expected
+              .to  include(expected_template_folder)
+              .and include(expected_domain_template_folder)
+              .and include(expected_global_template_folder)
+          end
+        end
       end
     end
 
-    context 'clone' do
-    end
+    context 'copy' do
+      let(:target) { copy }
 
-    context '.target_folders' do
-      subject { new_instance.target_folders }
+      context '.target_folders' do
+        context '.count' do
+          subject { target.target_folders.folders.count }
 
-      it { puts JSON.pretty_generate(new_instance.target_folders.folders) }
+          it { is_expected.to eq(3) }
+        end
 
-      # fit { is_expected.to inclhave_attributes(count: 2) }
-    end
+        context '.folders' do
+          subject { target.target_folders.folders }
 
-    context '.template_folders' do
-      subject { new_instance.template_folders }
+          it { is_expected.to have_key(:src).and have_key(:dst).and have_key(:custom) }
+        end
+      end
 
-      # fit { puts JSON.pretty_generate(new_instance.template_folders.ordered_keys) }
-      # fit { puts JSON.pretty_generate(new_instance.template_folders.ordered_folders) }
-      # fit { puts JSON.pretty_generate(new_instance.template_folders.folders) }
+      context '.template_folders' do
+        context '.count' do
+          subject { target.template_folders.folders.count }
 
-      # fit { is_expected.to inclhave_attributes(count: 2) }
+          it { is_expected.to eq(4) }
+        end
+
+        context '.folders' do
+          subject { target.template_folders.folders }
+
+          it { is_expected.to have_key(:global).and have_key(:domain).and have_key(:app).and have_key(:more) }
+        end
+
+        context '.ordered_keys' do
+          subject { target.template_folders.ordered_keys }
+
+          it { is_expected.to eq(%i[more app domain global]) }
+        end
+
+        context '.ordered_folders' do
+          subject { target.template_folders.ordered_folders }
+
+          it do
+            is_expected
+              .to  include('/more')
+              .and include(expected_template_folder)
+              .and include(expected_domain_template_folder)
+              .and include(expected_global_template_folder)
+          end
+        end
+      end
     end
   end
 
