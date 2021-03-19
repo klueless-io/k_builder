@@ -16,16 +16,40 @@ module KBuilder
       end
     end
 
-    def to_hash
+    # move out into module
+    def to_h
       hash = {}
       instance_variables.each do |var|
         value = instance_variable_get(var)
 
-        value = value.to_hash if value.is_a?(KBuilder::BaseConfiguration)
+        if complex_type?(value)
+          value = KBuilder.data.struct_to_hash(value)
+        elsif value.is_a?(KBuilder::BaseConfiguration)
+          value = value.to_hash
+        end
 
         hash[var.to_s.delete('@')] = value
       end
       hash
+    end
+
+    # Any basic (aka primitive) type
+    def basic_type?(value)
+      value.is_a?(String) ||
+        value.is_a?(Symbol) ||
+        value.is_a?(FalseClass) ||
+        value.is_a?(TrueClass) ||
+        value.is_a?(Integer) ||
+        value.is_a?(Float)
+    end
+
+    # Anything container that is not a regular class
+    def complex_type?(value)
+      value.is_a?(Array) ||
+      value.is_a?(Hash) ||
+      value.is_a?(Struct) ||
+      value.is_a?(OpenStruct) ||
+      value.respond_to?(:to_h)
     end
 
     def kv(name, value)

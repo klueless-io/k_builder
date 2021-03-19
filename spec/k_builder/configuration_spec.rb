@@ -5,9 +5,19 @@ RSpec.describe KBuilder::Configuration do
   let(:cfg) { ->(config) {} }
   let(:instance) { builder_module.configuration }
 
-  let(:custom_target_folder) { '~/my-target-folder' }
+  let(:custom_target_folder1) { '~/my-target-folder1' }
+  let(:custom_target_folder2) { '~/my-target-folder2' }
+
+  let(:expected_target_folder1) { File.expand_path(custom_target_folder1) }
+  let(:expected_target_folder2) { File.expand_path(custom_target_folder2) }
+
   let(:custom_template_folder) { '~/my-template-folder' }
+  let(:custom_domain_template_folder) { '~/my-template-folder-domain' }
   let(:custom_global_template_folder) { '~/my-template-folder-global' }
+
+  let(:expected_template_folder) { File.expand_path(custom_template_folder) }
+  let(:expected_domain_template_folder) { File.expand_path(custom_domain_template_folder) }
+  let(:expected_global_template_folder) { File.expand_path(custom_global_template_folder) }
 
   before :each do
     builder_module.configure(&cfg)
@@ -16,97 +26,118 @@ RSpec.describe KBuilder::Configuration do
     builder_module.reset
   end
 
-  describe '.template_folder' do
-    subject { instance.template_folder }
+  describe '.target_folders' do
+    subject { instance.target_folders.folders }
 
     context 'when not configured' do
-      it { is_expected.to eq(File.join(Dir.getwd, '.templates')) }
+      it { is_expected.to be_empty }
     end
 
     context 'when configured' do
       let(:cfg) do
         lambda { |config|
-          config.template_folder = custom_template_folder
+          config.target_folders.add(:src, custom_target_folder1)
+          config.target_folders.add(:dst, custom_target_folder2)
         }
       end
 
-      it { is_expected.to eq(custom_template_folder) }
+      it do
+        is_expected
+          .to  include(src: expected_target_folder1)
+          .and include(dst: expected_target_folder2)
+      end
     end
   end
 
-  describe '.global_template_folder' do
-    subject { instance.global_template_folder }
+  describe '.template_folders' do
+    subject { instance.template_folders }
 
     context 'when not configured' do
-      it { is_expected.to be_nil }
+      it { is_expected.not_to be_nil }
+
+      context '.ordered_keys' do
+        subject { instance.template_folders.ordered_keys }
+
+        it { is_expected.to be_empty }
+      end
+
+      context '.ordered_folders' do
+        subject { instance.template_folders.ordered_folders }
+      
+        it { is_expected.to be_empty }
+      end
+
+      context '.folders' do
+        subject { instance.template_folders.folders }
+      
+        it { is_expected.to be_empty }
+      end
     end
 
     context 'when configured' do
+      subject { instance.template_folders.ordered_folders }
+
       let(:cfg) do
         lambda { |config|
-          config.global_template_folder = custom_global_template_folder
+          config.template_folders.add(:global , custom_global_template_folder)
+          config.template_folders.add(:domain , custom_domain_template_folder)
+          config.template_folders.add(:app    , custom_template_folder)
         }
       end
 
-      it { is_expected.to eq(custom_global_template_folder) }
+      context '.ordered_keys' do
+        subject { instance.template_folders.ordered_keys }
+
+        it { is_expected.to eq([:app, :domain, :global]) }
+      end
+
+      context '.ordered_folders' do
+        subject { instance.template_folders.ordered_folders }
+      
+        it { is_expected.to eq([expected_template_folder, expected_domain_template_folder, expected_global_template_folder]) }
+      end
+
+      context '.folders' do
+        subject { instance.template_folders.folders }
+      
+        it do
+          is_expected
+            .to  include(:global => expected_global_template_folder)
+            .and include(:domain => expected_domain_template_folder)
+            .and include(:app => expected_template_folder)
+
+          # [expected_template_folder, expected_domain_template_folder, expected_global_template_folder]
+        end
+      end
     end
   end
 
-  describe '#as_hash' do
-    subject { instance.to_hash }
+  describe '#to_h' do
+    subject { instance.to_h }
+
+    let(:cfg) do
+      lambda { |config|
+        config.target_folders.add(:src, custom_target_folder1)
+        config.target_folders.add(:dst, custom_target_folder2)
+
+        config.template_folders.add(:global , custom_global_template_folder)
+        config.template_folders.add(:domain , custom_domain_template_folder)
+        config.template_folders.add(:app    , custom_template_folder)
+    }
+    end
 
     it do
       is_expected
-        .to  include('target_folder' => instance.target_folder)
-        .and include('template_folder' => instance.template_folder)
-        .and include('global_template_folder' => instance.global_template_folder)
+        .to be_a(Hash)
+        .and have_key('target_folders')
+        .and include('target_folders' => include(:src))
+        .and include('target_folders' => include(:dst))
+        .and have_key('target_folders')
+        .and have_key('template_folders')
+        .and include('template_folders' => include(:ordered))
+        .and include('template_folders' => include(:global))
+        .and include('template_folders' => include(:domain))
+        .and include('template_folders' => include(:app))
     end
   end
-
-  # context 'extend configuration via third parties' do
-  #   subject { instance }
-
-  #   it { is_expected.not_to be_nil }
-
-  #   it { is_expected.to be_a(KBuilder::Configuration).and respond_to(:third_party) }
-
-  #   context 'third party is attached' do
-  #     subject { instance.third_party }
-
-  #     it do
-  #       is_expected
-  #         .to  be_a(KBuilder::ThirdParty::Configuration)
-  #         .and respond_to(:aaa)
-  #         .and respond_to(:bbb)
-  #         .and respond_to(:ccc)
-  #     end
-  #   end
-
-  #   context 'configure' do
-  #     let(:cfg) do
-  #       lambda { |config|
-  #         config.template_folder = custom_template_folder
-  #         config.template_folder = custom_template_folder
-  #         config.global_template_folder = custom_global_template_folder
-  #         config.third_party.aaa = '1'
-  #         config.third_party.bbb = '2'
-  #         config.third_party.ccc = '3'
-  #       }
-  #     end
-
-  #     describe '#as_hash' do
-  #       subject { instance.to_hash }
-
-  #       it do
-  #         is_expected
-  #           .to  include('target_folder' => instance.target_folder)
-  #           .and include('template_folder' => instance.template_folder)
-  #           .and include('global_template_folder' => instance.global_template_folder)
-  #           .and include('third_party' => include('aaa' => '1'))
-  #           .and include('third_party' => include('bbb' => '2'))
-  #           .and include('third_party' => include('ccc' => '3'))
-  #       end
-  #     end
-  #   end
-  # end
 end
