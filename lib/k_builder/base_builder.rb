@@ -125,10 +125,6 @@ module KBuilder
     end
     alias cd set_current_folder
 
-    def current_folder_key
-      target_folders.current
-    end
-
     # Fluent adder for target folder (KBuilder::NamedFolders)
     def add_target_folder(folder_key, value)
       target_folders.add(folder_key, value)
@@ -136,16 +132,20 @@ module KBuilder
       self
     end
 
-    # Get target folder
+    def current_folder_key
+      target_folders.current
+    end
+
+    # Get target folder by folder_key
     #
-    # Defaults to current_target_folder
-    def get_target_folder(folder_key = current_folder_key)
+    # If folder_key not supplied then get the current target folder
+    def target_folder(folder_key = current_folder_key)
       target_folders.get(folder_key)
     end
 
     # Get target file
     def target_file(file_parts, folder: current_folder_key)
-      File.join(get_target_folder(folder), file_parts)
+      File.join(target_folder(folder), file_parts)
     end
 
     # Template folder & Files
@@ -243,11 +243,11 @@ module KBuilder
 
     def run_command(command)
       # Deep path create if needed
-      target_folder = get_target_folder
+      tf = target_folder
 
-      FileUtils.mkdir_p(target_folder)
+      FileUtils.mkdir_p(tf)
 
-      build_command = "cd #{target_folder} && #{command}"
+      build_command = "cd #{tf} && #{command}"
 
       puts build_command
 
