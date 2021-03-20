@@ -42,8 +42,6 @@ module KBuilder
       @target_folders = configuration.target_folders.clone
       @template_folders = configuration.template_folders.clone
 
-      # @custom_target_folder = @target_folders.folders.first.folder_key unless @target_folders.folders.length.zero?
-
       define_builder_setter_methods
     end
 
@@ -70,6 +68,44 @@ module KBuilder
     end
 
     # ----------------------------------------------------------------------
+    # Fluent interface
+    # ----------------------------------------------------------------------
+
+    # Internal Actions are considered helpers for the builder, they do
+    # something useful, but they do not tend to implement fluent interfaces.
+    #
+    # They some times do actions, they sometimes return information.
+    #
+    # NOTE: [SRP] - These methods should probably be converted into objects
+    # ----------------------------------------------------------------------
+
+    # Add a file to the target location
+    #
+    # @param [String] file The file name with or without relative path, eg. my_file.json or src/my_file.json
+    # @option opts [String] :content Supply the content that you want to write to the file
+    # @option opts [String] :template Supply the template that you want to write to the file, template will be processed  ('nobody') From address
+    # @option opts [String] :content_file File with content, file location is based on where the program is running
+    # @option opts [String] :template_file File with handlebars templated content that will be transformed, file location is based on the configured template_path
+    #
+    # Extra options will be used as data for templates, e.g
+    # @option opts [String] :to Recipient email
+    # @option opts [String] :body The email's body
+    def add_file(file, **opts)
+      full_file = target_file(file)
+
+      FileUtils.mkdir_p(File.dirname(full_file))
+
+      content = process_any_content(**opts)
+
+      File.write(full_file, content)
+
+      # Prettier needs to work with the original file name
+      run_prettier file if opts.key?(:pretty)
+
+      self
+    end
+
+    # ----------------------------------------------------------------------
     # Attributes: Think getter/setter
     #
     # The following getter/setters can be referenced both inside and outside
@@ -79,15 +115,8 @@ module KBuilder
     # set_: Only setters with the prefix _set are considered fluent.
     # ----------------------------------------------------------------------
 
-    # Target folder
+    # Target folders and files
     # ----------------------------------------------------------------------
-
-    # Fluent adder for target folder (KBuilder::NamedFolders)
-    def add_target_folder(folder_key, value)
-      target_folders.add(folder_key, value)
-
-      self
-    end
 
     def set_current_folder(folder_key)
       target_folders.current = folder_key
@@ -100,6 +129,13 @@ module KBuilder
       target_folders.current
     end
 
+    # Fluent adder for target folder (KBuilder::NamedFolders)
+    def add_target_folder(folder_key, value)
+      target_folders.add(folder_key, value)
+
+      self
+    end
+
     # Get target folder
     #
     # Defaults to current_target_folder
@@ -108,11 +144,11 @@ module KBuilder
     end
 
     # Get target file
-    def target_file(file_parts, folder: nil)
+    def target_file(file_parts, folder: current_folder_key)
       File.join(get_target_folder(folder), file_parts)
     end
 
-    # Target folder
+    # Template folder & Files
     # ----------------------------------------------------------------------
 
     # Fluent adder for template folder (KBuilder::LayeredFolders)
@@ -126,6 +162,98 @@ module KBuilder
     def get_template_folder(folder_key)
       template_folders.get(folder_key)
     end
+
+    # Gets a template_file relative to the template folder, looks first in
+    # local template folder and if not found, looks in global template folder
+    def find_template_file(file_parts)
+      template_folders.find_file(file_parts)
+    end
+
+    # Building content from templates
+    # ----------------------------------------------------------------------
+
+    # Use content from a a selection of content sources
+    #
+    # @option opts [String] :content Just pass through the :content as is.
+    # @option opts [String] :content_file Read content from the :content_file
+    #
+    # Future options
+    # @option opts [String] :content_loren [TODO]Create Loren Ipsum text as a :content_loren count of words
+    # @option opts [String] :content_url Read content from the :content_url
+    #
+    # @return Returns some content
+    def use_content(**opts)
+      return opts[:content] unless opts[:content].nil?
+
+      return unless opts[:content_file]
+
+      cf = opts[:content_file]
+
+      return "Content not found: #{File.expand_path(cf)}" unless File.exist?(cf)
+
+      File.read(cf)
+    end
+
+    # Use template from a a selection of template sources
+    #
+    # @option opts [String] :template Just pass through the :template as is.
+    # @option opts [String] :template_file Read template from the :template_file
+    #
+    # @return Returns some template
+    def use_template(**opts)
+      return opts[:template] unless opts[:template].nil?
+
+      return unless opts[:template_file]
+
+      tf = find_template_file(opts[:template_file])
+
+      return "template not found: #{opts[:template_file]}" if tf.nil?
+
+      File.read(tf)
+    end
+
+    # Process content will take any one of the following
+    #  - Raw content
+    #  - File based content
+    #  - Raw template (translated via handlebars)
+    #  - File base template (translated via handlebars)
+    #
+    # Process any of the above inputs to create final content output
+    #
+    # @option opts [String] :content Supply the content that you want to write to the file
+    # @option opts [String] :template Supply the template that you want to write to the file, template will be transformed using handlebars
+    # @option opts [String] :content_file File with content, file location is based on where the program is running
+    # @option opts [String] :template_file File with handlebars templated content that will be transformed, file location is based on the configured template_path
+    def process_any_content(**opts)
+      raw_content = use_content(**opts)
+
+      return raw_content if raw_content
+
+      template_content = use_template(**opts)
+
+      Handlebars::Helpers::Template.render(template_content, opts) unless template_content.nil?
+    end
+
+    def run_prettier(file, log_level: :log)
+      # command = "prettier --check #{file} --write #{file}"
+      command = "npx prettier --loglevel #{log_level} --write #{file}"
+
+      run_command command
+    end
+
+    def run_command(command)
+      # Deep path create if needed
+      target_folder = get_target_folder
+
+      FileUtils.mkdir_p(target_folder)
+
+      build_command = "cd #{target_folder} && #{command}"
+
+      puts build_command
+
+      system(build_command)
+    end
+    alias rc run_command
 
     # TODO
     # Support Nesting

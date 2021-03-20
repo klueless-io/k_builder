@@ -7,11 +7,13 @@ RSpec.describe 'Usecases::BuilderUsingConfiguration' do
     usecases_folder = File.join(Dir.getwd, 'spec', 'usecases')
 
     KBuilder.configure do |config|
-      config.template_folder = File.join(usecases_folder, '.app_template')
-      config.global_template_folder = File.join(usecases_folder, '.global_template')
-      config.target_folder = File.join(usecases_folder, '.output')
+      config.target_folders.add(:app, File.join(usecases_folder, '.output'))
+
+      config.template_folders.add(:global , File.join(usecases_folder, '.global_template'))
+      config.template_folders.add(:app , File.join(usecases_folder, '.app_template'))
     end
   end
+
   after :each do
     KBuilder.reset
   end
@@ -24,7 +26,7 @@ RSpec.describe 'Usecases::BuilderUsingConfiguration' do
         Configured Output Folder          : {{c}}
       TEXT
 
-      builder = KBuilder::Builder.init
+      builder = KBuilder::BaseBuilder.init
 
       builder
         .add_file('main.rb', template_file: 'class.rb', name: 'main')
@@ -38,9 +40,9 @@ RSpec.describe 'Usecases::BuilderUsingConfiguration' do
                   fields: %i[street1 street2 post_code state])
         .add_file('configuration.log.txt',
                   template: template,
-                  a: builder.template_folder,
-                  b: builder.global_template_folder,
-                  c: builder.target_folder)
+                  a: builder.get_template_folder(:app),
+                  b: builder.get_template_folder(:global),
+                  c: builder.get_target_folder)
         .add_file('css/index.css',
                   template: '{{#each colors}} .{{.}} { color: {{.}} }  {{/each}}',
                   colors: %w[red blue green],
