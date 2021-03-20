@@ -9,7 +9,9 @@ module KBuilder
   #             these methods would not be prefixed with the set_
   class BaseBuilder
     attr_reader :configuration
+
     attr_accessor :target_folders
+
     attr_accessor :template_folders
 
     # Factory method that provides a builder for a specified structure
@@ -39,6 +41,8 @@ module KBuilder
 
       @target_folders = configuration.target_folders.clone
       @template_folders = configuration.template_folders.clone
+
+      # @custom_target_folder = @target_folders.folders.first.folder_key unless @target_folders.folders.length.zero?
 
       define_builder_setter_methods
     end
@@ -85,8 +89,21 @@ module KBuilder
       self
     end
 
+    def set_current_folder(folder_key)
+      target_folders.current = folder_key
+
+      self
+    end
+    alias cd set_current_folder
+
+    def current_folder_key
+      target_folders.current
+    end
+
     # Get target folder
-    def get_target_folder(folder_key)
+    #
+    # Defaults to current_target_folder
+    def get_target_folder(folder_key = current_folder_key)
       target_folders.get(folder_key)
     end
 
