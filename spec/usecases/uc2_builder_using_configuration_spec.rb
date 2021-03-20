@@ -40,8 +40,8 @@ RSpec.describe 'Usecases::BuilderUsingConfiguration' do
                   fields: %i[street1 street2 post_code state])
         .add_file('configuration.log.txt',
                   template: template,
-                  a: builder.template_folder(:app),
-                  b: builder.template_folder(:global),
+                  a: builder.get_template_folder(:app),
+                  b: builder.get_template_folder(:global),
                   c: builder.target_folder)
         .add_file('css/index.css',
                   template: '{{#each colors}} .{{.}} { color: {{.}} }  {{/each}}',
