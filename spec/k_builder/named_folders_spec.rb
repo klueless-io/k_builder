@@ -2,8 +2,8 @@
 
 RSpec.describe KBuilder::NamedFolders do
   let(:instance) { described_class.new }
-  let(:samples_folder) { File.join(Dir.getwd, 'spec', 'samples') }
-  let(:target_folder) { File.join(samples_folder, 'target') }
+  let(:sample_assets_folder) { File.join(Dir.getwd, 'spec', 'sample-assets') }
+  let(:target_folder) { File.join(sample_assets_folder, 'target') }
   let(:webpack_folder) { File.join(target_folder, 'config') }
   let(:slide_folder) { '~/slides' }
 
@@ -204,8 +204,8 @@ RSpec.describe KBuilder::NamedFolders do
 
       it do
         is_expected
-          .to  include(app: '/Users/davidcruwys/dev/kgems/k_builder/spec/samples/target')
-          .and include(webpack: '/Users/davidcruwys/dev/kgems/k_builder/spec/samples/target/config')
+          .to  include(app: '/Users/davidcruwys/dev/kgems/k_builder/spec/sample-assets/target')
+          .and include(webpack: '/Users/davidcruwys/dev/kgems/k_builder/spec/sample-assets/target/config')
       end
     end
   end

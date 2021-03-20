@@ -5,14 +5,14 @@ RSpec.describe KBuilder::Builder do
   let(:cfg) { ->(config) {} }
   let(:builder) { described_class.new }
 
-  let(:samples_folder) { File.join(Dir.getwd, 'spec', 'samples') }
+  let(:sample_assets_folder) { File.join(Dir.getwd, 'spec', 'sample-assets') }
 
-  let(:target_folder) { File.join(samples_folder, 'target') }
-  let(:target_documentation_folder) { File.join(samples_folder, 'target-documentation') }
+  let(:target_folder) { File.join(sample_assets_folder, 'target') }
+  let(:target_documentation_folder) { File.join(sample_assets_folder, 'target-documentation') }
 
-  let(:app_template_folder) { File.join(samples_folder, 'app-template') }
-  let(:domain_template_folder) { File.join(samples_folder, 'domain-template') }
-  let(:global_template_folder) { File.join(samples_folder, 'global-template') }
+  let(:app_template_folder) { File.join(sample_assets_folder, 'app-template') }
+  let(:domain_template_folder) { File.join(sample_assets_folder, 'domain-template') }
+  let(:global_template_folder) { File.join(sample_assets_folder, 'global-template') }
 
   before :each do
     builder_module.configure(&cfg)
@@ -21,13 +21,13 @@ RSpec.describe KBuilder::Builder do
     builder_module.reset
   end
 
-  describe '#initialize (constructor)' do
-    subject { builder }
+  # describe '#initialize (constructor)' do
+  #   subject { builder }
 
-    context 'with default configuration' do
-      it { is_expected.not_to be_nil }
-    end
-  end
+  #   context 'with default configuration' do
+  #     it { is_expected.not_to be_nil }
+  #   end
+  # end
 
   describe '#init' do
     subject { described_class.init }
@@ -35,141 +35,141 @@ RSpec.describe KBuilder::Builder do
     it { is_expected.to be_a(described_class) }
 
     describe '.hash' do
-      context 'via custom hash configuration' do
-        subject { described_class.init(config).hash }
+      # context 'via custom hash configuration' do
+      #   subject { described_class.init(config).hash }
 
-        context 'with empty hash' do
-          let(:config) { {} }
+      #   context 'with empty hash' do
+      #     let(:config) { {} }
 
-          it do
-            is_expected
-              .to  be_a(Hash)
-              .and include('target_folders' => {})
-              .and include('template_folders' => [])
-          end
-        end
-        context 'with default configuration' do
-          let(:config) { nil }
+      #     it do
+      #       is_expected
+      #         .to  be_a(Hash)
+      #         .and include('target_folders' => {})
+      #         .and include('template_folders' => [])
+      #     end
+      #   end
+      #   context 'with default configuration' do
+      #     let(:config) { nil }
 
-          it do
-            is_expected
-              .to  be_a(Hash)
-              .and include('target_folders' => {})
-              .and include('template_folders' => [])
-          end
-        end
-      end
+      #     it do
+      #       is_expected
+      #         .to  be_a(Hash)
+      #         .and include('target_folders' => {})
+      #         .and include('template_folders' => [])
+      #     end
+      #   end
+      # end
 
-      context 'with typed configuration' do
-        subject { described_class.init.hash }
+      # context 'with typed configuration' do
+      #   subject { described_class.init.hash }
 
-        context 'when empty' do
-          let(:cfg) do
-            lambda { |config|
-            }
-          end
+      #   context 'when empty' do
+      #     let(:cfg) do
+      #       lambda { |config|
+      #       }
+      #     end
 
-          it do
-            is_expected
-              .to  be_a(Hash)
-              .and include('target_folders' => {})
-              .and include('template_folders' => [])
-          end
-        end
+      #     it do
+      #       is_expected
+      #         .to  be_a(Hash)
+      #         .and include('target_folders' => {})
+      #         .and include('template_folders' => [])
+      #     end
+      #   end
 
-        context 'when configured' do
-          let(:cfg) do
-            lambda { |config|
-              config.target_folders.add(:app, target_folder)
-              config.target_folders.add(:documentation, target_documentation_folder)
+      #   context 'when configured' do
+      #     let(:cfg) do
+      #       lambda { |config|
+      #         config.target_folders.add(:app, target_folder)
+      #         config.target_folders.add(:documentation, target_documentation_folder)
 
-              config.template_folders.add(global_template_folder)
-              config.template_folders.add(global_template_folder)
-              config.template_folders.add(app_template_folder)
-            }
-          end
+      #         config.template_folders.add(global_template_folder)
+      #         config.template_folders.add(global_template_folder)
+      #         config.template_folders.add(app_template_folder)
+      #       }
+      #     end
 
-          it do
-            is_expected
-              .to  be_a(Hash)
-              .and include('target_folders' => {})
-              .and include('template_folders' => [])
-          end
-        end
-      end
+      #     it do
+      #       is_expected
+      #         .to  be_a(Hash)
+      #         .and include('target_folders' => {})
+      #         .and include('template_folders' => [])
+      #     end
+      #   end
+      # end
 
-      context 'with custom configuration via hash' do
-        context 'when empty' do
-          let(:config) { {} }
+      # context 'with custom configuration via hash' do
+      #   context 'when empty' do
+      #     let(:config) { {} }
 
-          it { is_expected.to eq({}) }
-        end
+      #     it { is_expected.to eq({}) }
+      #   end
 
-        context 'when configured with nil' do
-          let(:config) do
-            {
-              'target_folders' => {
-                'src' => '/Users/davidcruwys/my-target-folder1',
-                'dst' => '/Users/davidcruwys/my-target-folder2'
-              },
-              'template_folders' => [
-                '/Users/davidcruwys/my-template-folder',
-                '/Users/davidcruwys/my-template-folder-domain',
-                '/Users/davidcruwys/my-template-folder-global'
-              ]
-            }
-          end
-          it {
-            puts JSON.pretty_generate(subject)
-          }
+      #   context 'when configured with nil' do
+      #     let(:config) do
+      #       {
+      #         'target_folders' => {
+      #           'src' => '/Users/davidcruwys/my-target-folder1',
+      #           'dst' => '/Users/davidcruwys/my-target-folder2'
+      #         },
+      #         'template_folders' => [
+      #           '/Users/davidcruwys/my-template-folder',
+      #           '/Users/davidcruwys/my-template-folder-domain',
+      #           '/Users/davidcruwys/my-template-folder-global'
+      #         ]
+      #       }
+      #     end
+      #     it {
+      #       puts JSON.pretty_generate(subject)
+      #     }
 
-          it do
-            puts JSON.pretty_generate(subject)
-            is_expected
-              .to  be_a(Hash)
-              .and include('target_folders' => include(src: File.expand_path(custom_target_folder1),
-                                                       dst: File.expand_path(custom_target_folder2)))
-            # .and include('template_folder' => be_nil)
-            # .and include('global_template_folder' => be_nil)
-          end
-        end
+      #     it do
+      #       puts JSON.pretty_generate(subject)
+      #       is_expected
+      #         .to  be_a(Hash)
+      #         .and include('target_folders' => include(src: File.expand_path(custom_target_folder1),
+      #                                                  dst: File.expand_path(custom_target_folder2)))
+      #       # .and include('template_folder' => be_nil)
+      #       # .and include('global_template_folder' => be_nil)
+      #     end
+      #   end
 
-        context 'when configured with nil' do
-          let(:config) do
-            {
-              'target_folder' => '/xmen',
-              'template_folder' => '/xmen',
-              'global_template_folder' => '/xmen'
-            }
-          end
+      #   context 'when configured with nil' do
+      #     let(:config) do
+      #       {
+      #         'target_folder' => '/xmen',
+      #         'template_folder' => '/xmen',
+      #         'global_template_folder' => '/xmen'
+      #       }
+      #     end
 
-          it do
-            is_expected
-              .to  be_a(Hash)
-              .and include('target_folder' => eq('/xmen'))
-              .and include('template_folder' => eq('/xmen'))
-              .and include('global_template_folder' => eq('/xmen'))
-          end
-        end
+      #     it do
+      #       is_expected
+      #         .to  be_a(Hash)
+      #         .and include('target_folder' => eq('/xmen'))
+      #         .and include('template_folder' => eq('/xmen'))
+      #         .and include('global_template_folder' => eq('/xmen'))
+      #     end
+      #   end
 
-        context 'when configured with nil' do
-          let(:config) do
-            {
-              'target_folder' => '~/xmen',
-              'template_folder' => '~/xmen',
-              'global_template_folder' => '~/xmen'
-            }
-          end
+      #   context 'when configured with nil' do
+      #     let(:config) do
+      #       {
+      #         'target_folder' => '~/xmen',
+      #         'template_folder' => '~/xmen',
+      #         'global_template_folder' => '~/xmen'
+      #       }
+      #     end
 
-          it do
-            is_expected
-              .to  be_a(Hash)
-              .and include('target_folder' => eq(File.expand_path('~/xmen')))
-              .and include('template_folder' => eq(File.expand_path('~/xmen')))
-              .and include('global_template_folder' => eq(File.expand_path('~/xmen')))
-          end
-        end
-      end
+      #     it do
+      #       is_expected
+      #         .to  be_a(Hash)
+      #         .and include('target_folder' => eq(File.expand_path('~/xmen')))
+      #         .and include('template_folder' => eq(File.expand_path('~/xmen')))
+      #         .and include('global_template_folder' => eq(File.expand_path('~/xmen')))
+      #     end
+      #   end
+      # end
     end
   end
 
@@ -353,8 +353,8 @@ RSpec.describe KBuilder::Builder do
         .process_any_content(**opts)
     end
 
-    let(:app_template_folder) { File.join(Dir.getwd, 'spec', 'samples', 'app-template') }
-    let(:global_template_folder) { File.join(Dir.getwd, 'spec', 'samples', 'global-template') }
+    let(:app_template_folder) { File.join(Dir.getwd, 'spec', 'sample-assets', 'app-template') }
+    let(:global_template_folder) { File.join(Dir.getwd, 'spec', 'sample-assets', 'global-template') }
 
     let(:opts) { {} }
 
@@ -442,7 +442,7 @@ RSpec.describe KBuilder::Builder do
       end
 
       context 'when content_file: "some-text.txt"' do
-        let(:opts) { { content_file: File.join(samples_folder, 'some-text.txt') } }
+        let(:opts) { { content_file: File.join(sample_assets_folder, 'some-text.txt') } }
 
         it { is_expected.to eq('Some text from a text file') }
       end
