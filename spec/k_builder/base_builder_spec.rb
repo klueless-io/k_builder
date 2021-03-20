@@ -136,8 +136,8 @@ RSpec.describe KBuilder::BaseBuilder do
       end
     end
 
-    describe '.get_target_folder with not paramaters' do
-      subject { instance.get_target_folder }
+    describe '.target_folder with not paramaters' do
+      subject { instance.target_folder }
 
       context 'when first initialized' do
         before { instance.cd(:src) }
@@ -194,9 +194,9 @@ RSpec.describe KBuilder::BaseBuilder do
 
   context 'accessors (fluent and non-fluent)' do
     # Target (NamedFolders)
-    describe '#get_target_folder' do
+    describe '#target_folder' do
       context 'when unknown' do
-        subject { instance.get_target_folder(:yyy) }
+        subject { instance.target_folder(:yyy) }
 
         it { expect { subject }.to raise_error KBuilder::Error }
       end
@@ -204,7 +204,7 @@ RSpec.describe KBuilder::BaseBuilder do
       context 'when known' do
         include_context 'basic configuration'
 
-        subject { instance.get_target_folder(:src) }
+        subject { instance.target_folder(:src) }
 
         it { is_expected.to eq(target_folder) }
       end
@@ -254,7 +254,7 @@ RSpec.describe KBuilder::BaseBuilder do
 
     describe '#add_target_folder()' do
       context 'when known' do
-        subject { instance.add_target_folder(:yyy, '~/yyy').get_target_folder(:yyy) }
+        subject { instance.add_target_folder(:yyy, '~/yyy').target_folder(:yyy) }
 
         it { is_expected.to eq(File.expand_path('~/yyy')) }
       end
