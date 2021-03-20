@@ -11,18 +11,6 @@ module KBuilder
       super(configuration)
     end
 
-    def after_new
-      # Generally loaded from configuration, if missing then initialize
-      hash['target_folders'] = {} if hash['target_folders'].nil?
-      hash['template_folders'] = [] if hash['template_folders'].nil?
-
-      # self.target_folders = hash['target_folders'] unless hash['target_folders'].nil?
-      # self.target_folders = hash['target_folders'] unless hash['target_folders'].nil?
-      # self.target_folder = hash['target_folder'] unless hash['target_folder'].nil?
-      # self.template_folder = hash['template_folder'] unless hash['template_folder'].nil?
-      # self.global_template_folder = hash['global_template_folder'] unless hash['global_template_folder'].nil?
-    end
-
     # Return an array of symbols to represent the fluent setter methods in this builder.
     def builder_setter_methods
       # Currently I have manually created my settings because I needed custom

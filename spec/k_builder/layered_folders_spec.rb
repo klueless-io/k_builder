@@ -2,13 +2,13 @@
 
 RSpec.describe KBuilder::LayeredFolders do
   let(:instance) { described_class.new }
-  let(:samples_folder) { File.join(Dir.getwd, 'spec', 'samples') }
+  let(:sample_assets_folder) { File.join(Dir.getwd, 'spec', 'sample-assets') }
   let(:fallback_folder) { '~/x' }
   let(:expected_fallback_folder) { File.expand_path(fallback_folder) }
-  let(:app_template_folder) { File.join(samples_folder, 'app-template') }
-  let(:domain_template_folder) { File.join(samples_folder, 'domain-template') }
-  let(:global_template_folder) { File.join(samples_folder, 'global-template') }
-  let(:global_template_shim_folder) { File.join(samples_folder, 'global-shim-template') }
+  let(:app_template_folder) { File.join(sample_assets_folder, 'app-template') }
+  let(:domain_template_folder) { File.join(sample_assets_folder, 'domain-template') }
+  let(:global_template_folder) { File.join(sample_assets_folder, 'global-template') }
+  let(:global_template_shim_folder) { File.join(sample_assets_folder, 'global-shim-template') }
 
   describe '#initialize' do
     subject { instance }

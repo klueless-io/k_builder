@@ -9,6 +9,8 @@ module KBuilder
   #             these methods would not be prefixed with the set_
   class BaseBuilder
     attr_reader :configuration
+    attr_accessor :target_folders
+    attr_accessor :template_folders
 
     # Factory method that provides a builder for a specified structure
     # runs through a configuration block and then builds the final structure
@@ -20,33 +22,23 @@ module KBuilder
 
     # Create and initialize the builder.
     #
-    # Initialization can be done via any of these three sequential steps.
-    #   - Configuration hash
-    #   - After new event
-    #   - Configuration block (lambda)
-    #
     # @return [Builder] Returns the builder via fluent interface
     def self.init(configuration = nil)
       builder = new(configuration)
-
-      builder.after_new
 
       yield(builder) if block_given?
 
       builder
     end
 
-    # Use after_new to massage hash values that come in via
-    # configuration into more complex values
-    #
-    # Abstract method
-    def after_new; end
-
     # assigns a builder hash and defines builder methods
     def initialize(configuration = nil)
       configuration = KBuilder.configuration if configuration.nil?
 
       @configuration = configuration
+
+      @target_folders = configuration.target_folders.clone
+      @template_folders = configuration.template_folders.clone
 
       define_builder_setter_methods
     end
@@ -64,6 +56,58 @@ module KBuilder
     #                           have wrapped around the hash
     def build
       raise NotImplementedError
+    end
+
+    def to_h
+      {
+        target_folders: target_folders.to_h,
+        template_folders: template_folders.to_h
+      }
+    end
+
+    # ----------------------------------------------------------------------
+    # Attributes: Think getter/setter
+    #
+    # The following getter/setters can be referenced both inside and outside
+    # of the fluent builder fluent API. They do not implement the fluent
+    # interface unless prefixed by set_.
+    #
+    # set_: Only setters with the prefix _set are considered fluent.
+    # ----------------------------------------------------------------------
+
+    # Target folder
+    # ----------------------------------------------------------------------
+
+    # Fluent adder for target folder (KBuilder::NamedFolders)
+    def add_target_folder(folder_key, value)
+      target_folders.add(folder_key, value)
+
+      self
+    end
+
+    # Get target folder
+    def get_target_folder(folder_key)
+      target_folders.get(folder_key)
+    end
+
+    # Get target file
+    def target_file(file_parts, folder: nil)
+      File.join(get_target_folder(folder), file_parts)
+    end
+
+    # Target folder
+    # ----------------------------------------------------------------------
+
+    # Fluent adder for template folder (KBuilder::LayeredFolders)
+    def add_template_folder(folder_key, value)
+      template_folders.add(folder_key, value)
+
+      self
+    end
+
+    # Get for template folder
+    def get_template_folder(folder_key)
+      template_folders.get(folder_key)
     end
 
     # TODO
