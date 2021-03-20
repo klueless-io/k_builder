@@ -41,16 +41,6 @@ module KBuilder
 
       @target_folders = configuration.target_folders.clone
       @template_folders = configuration.template_folders.clone
-
-      define_builder_setter_methods
-    end
-
-    # Return an array of symbols to represent the fluent
-    # setter methods that you want on your builder.
-    #
-    # Abstract method
-    def builder_setter_methods
-      []
     end
 
     # @return [Hash/StrongType] Returns data object, can be a hash
@@ -254,63 +244,5 @@ module KBuilder
       system(build_command)
     end
     alias rc run_command
-
-    # TODO
-    # Support Nesting
-    # Support Generation fo the following
-    #   - fluent set_
-    #   - Support setter (non-fluent)
-    #   - Support getter (non-fluent)
-
-    # # builds a nested structure by either builder block or hash
-    # # @param data_structure [type=DataStructure]
-    # # @param builder [type=Builder]
-    # # @param attributes [type=Hash|DataStructure instance]
-    # # @param &block
-    # #
-    # # @return [type=Hash]
-    # def build_nested(data_structure, builder, attributes = {}, &block)
-    #   if block_given?
-    #     builder.build(&block).to_h
-    #   else
-    #     build_hash(data_structure, attributes)
-    #   end
-    # end
-
-    private
-
-    # #
-    # # @param data_structure [type=DataStructure]
-    # # @param attributes [type=Hash, DataStructure]
-    # #
-    # # @return [type=Hash]
-    # def build_hash(data_structure, attributes)
-    #   if attributes.is_a?(data_structure)
-    #     attributes.to_h
-    #   else
-    #     data_structure.new(attributes).to_h
-    #   end
-    # end
-
-    # Defines all of the necessary builder setter methods
-    #
-    # @return [Builder] Returns the builder via fluent interface
-    def define_builder_setter_methods
-      builder_setter_methods.each { |method| define_builder_method(method) }
-      self
-    end
-
-    # Defines a method using the convention set_[method_name]
-    #
-    # Convention: Setter methods (are Fluent) and use the prefix set_
-    #             Getter methods (are NOT fluent) and return the stored value
-    #
-    # @return [Builder] Returns the builder via fluent interface
-    def define_builder_method(method_name)
-      self.class.send(:define_method, "set_#{method_name}") do |value|
-        @hash[method_name.to_s] = value
-        self
-      end
-    end
   end
 end
