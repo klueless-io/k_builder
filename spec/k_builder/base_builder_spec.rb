@@ -30,6 +30,19 @@ RSpec.describe KBuilder::BaseBuilder do
     end
   end
 
+  shared_context 'complete configuration' do
+    let(:cfg) do
+      lambda { |config|
+        config.target_folders.add(:src, target_folder)
+        config.target_folders.add(:doc, target_documentation_folder)
+
+        config.template_folders.add(:global , global_template_folder)
+        config.template_folders.add(:domain, domain_template_folder)
+        config.template_folders.add(:app , app_template_folder)
+      }
+    end
+  end
+
   describe '#initialize' do
     subject { instance }
 
@@ -56,6 +69,12 @@ RSpec.describe KBuilder::BaseBuilder do
         it { is_expected.to be_empty }
       end
 
+      context '.target_folders.current' do
+        subject { instance.target_folders.current }
+
+        it { is_expected.to be_nil }
+      end
+
       context '.template_folders.folders' do
         subject { instance.template_folders.folders }
 
@@ -72,10 +91,46 @@ RSpec.describe KBuilder::BaseBuilder do
         it { is_expected.not_to be_empty }
       end
 
+      context '.target_folders.current' do
+        subject { instance.target_folders.current }
+
+        it { is_expected.to eq(:src) }
+      end
+
       context '.template_folders.folders' do
         subject { instance.template_folders.folders }
 
         it { is_expected.not_to be_empty }
+      end
+    end
+  end
+
+  describe '#set_current_folder (alias: cd)' do
+    include_context 'complete configuration'
+
+    describe '.current_folder_key' do
+      subject { instance.current_folder_key }
+
+      context 'when first initialized' do
+        before { instance.cd(:src) }
+        it { is_expected.to eq(:src) }
+      end
+      context 'when changed' do
+        before { instance.cd(:doc) }
+        it { is_expected.to eq(:doc) }
+      end
+    end
+
+    describe '.get_target_folder with not paramaters' do
+      subject { instance.get_target_folder }
+
+      context 'when first initialized' do
+        before { instance.cd(:src) }
+        it { is_expected.to eq(target_folder) }
+      end
+      context 'when changed' do
+        before { instance.cd(:doc) }
+        it { is_expected.to eq(target_documentation_folder) }
       end
     end
   end

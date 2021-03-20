@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# attr_accessor :current_target_folder
+
 RSpec.describe KBuilder::NamedFolders do
   let(:instance) { described_class.new }
   let(:sample_assets_folder) { File.join(Dir.getwd, 'spec', 'sample-assets') }
@@ -87,8 +89,8 @@ RSpec.describe KBuilder::NamedFolders do
     # end
   end
 
-  # Join for joining named folders to sub-folders
   describe '#join' do
+    # Join for joining named folders to sub-folders
     before { instance.add(:app, target_folder) }
 
     context 'join folder' do
@@ -104,8 +106,8 @@ RSpec.describe KBuilder::NamedFolders do
     end
   end
 
-  # Get_filename for joining named folders to sub-folders + file (alias to #join)
   describe '#get_filename' do
+    # get_filename for joining named folders to sub-folders + file (alias to #join)
     before { instance.add(:app, target_folder) }
     context 'get_filename folder' do
       subject { instance.get_filename(:app, 'output.txt') }
@@ -146,6 +148,39 @@ RSpec.describe KBuilder::NamedFolders do
       end
 
       it { is_expected.to eq(%i[app webpack]) }
+    end
+  end
+
+  describe '.current' do
+    subject { instance.current }
+
+    context 'no folders' do
+      it { is_expected.to be_nil }
+    end
+
+    context 'when first folder added' do
+      before { instance.add(:app, target_folder) }
+
+      it { is_expected.to eq(:app) }
+
+      context 'when second folder added' do
+        before { instance.add(:webpack, instance.join(:app, 'config')) }
+
+        it { is_expected.to eq(:app) }
+
+        describe '.current=' do
+          context 'when valid folder key' do
+            before { instance.current = :webpack }
+
+            it { is_expected.to eq(:webpack) }
+          end
+          context 'when invalid folder key' do
+            subject { instance.current = :xxx }
+
+            it { expect { subject }.to raise_error(KBuilder::Error, 'Folder not found, this folder key not found: xxx') }
+          end
+        end
+      end
     end
   end
 

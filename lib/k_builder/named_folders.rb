@@ -36,14 +36,22 @@ module KBuilder
   class NamedFolders
     attr_reader :folders
 
+    attr_reader :current
+
     def initialize
       @folders = {}
+      @current = nil
     end
 
     def initialize_copy(orig)
       super(orig)
 
       @folders = orig.folders.clone
+    end
+
+    def current=(folder_key)
+      guard_folder_key(folder_key)
+      @current = folder_key
     end
 
     def add(folder_key, folder)
@@ -54,13 +62,13 @@ module KBuilder
         folder = File.expand_path(folder)
       end
 
+      @current = folder_key if @current.nil?
       folders[folder_key] = folder
     end
 
     # Get a folder
     def get(folder_key)
-      raise KBuilder::Error, "Folder not found, this folder key not found: #{folder_key}" unless folders.key?(folder_key)
-
+      guard_folder_key(folder_key)
       folders[folder_key]
     end
 
@@ -81,6 +89,12 @@ module KBuilder
 
     def to_h
       @folders
+    end
+
+    private
+
+    def guard_folder_key(folder_key)
+      raise KBuilder::Error, "Folder not found, this folder key not found: #{folder_key}" unless folders.key?(folder_key)
     end
   end
 end
