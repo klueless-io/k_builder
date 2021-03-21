@@ -26,6 +26,38 @@ RSpec.describe KBuilder::Configuration do
     builder_module.reset
   end
 
+  shared_context 'target configuration' do
+    let(:cfg) do
+      lambda { |config|
+        config.target_folders.add(:src, custom_target_folder1)
+        config.target_folders.add(:dst, custom_target_folder2)
+      }
+    end
+  end
+
+  shared_context 'template configuration' do
+    let(:cfg) do
+      lambda { |config|
+        config.template_folders.add(:global , custom_global_template_folder)
+        config.template_folders.add(:domain , custom_domain_template_folder)
+        config.template_folders.add(:app    , custom_template_folder)
+      }
+    end
+  end
+
+  shared_context 'target + template configuration' do
+    let(:cfg) do
+      lambda { |config|
+        config.target_folders.add(:src, custom_target_folder1)
+        config.target_folders.add(:dst, custom_target_folder2)
+
+        config.template_folders.add(:global , custom_global_template_folder)
+        config.template_folders.add(:domain , custom_domain_template_folder)
+        config.template_folders.add(:app    , custom_template_folder)
+      }
+    end
+  end
+
   describe '.target_folders' do
     subject { instance.target_folders.folders }
 
@@ -34,12 +66,7 @@ RSpec.describe KBuilder::Configuration do
     end
 
     context 'when configured' do
-      let(:cfg) do
-        lambda { |config|
-          config.target_folders.add(:src, custom_target_folder1)
-          config.target_folders.add(:dst, custom_target_folder2)
-        }
-      end
+      include_context 'target configuration'
 
       it do
         is_expected
@@ -73,17 +100,11 @@ RSpec.describe KBuilder::Configuration do
         it { is_expected.to be_empty }
       end
     end
-
+  
     context 'when configured' do
-      subject { instance.template_folders.ordered_folders }
+      include_context 'template configuration'
 
-      let(:cfg) do
-        lambda { |config|
-          config.template_folders.add(:global , custom_global_template_folder)
-          config.template_folders.add(:domain , custom_domain_template_folder)
-          config.template_folders.add(:app    , custom_template_folder)
-        }
-      end
+      subject { instance.template_folders.ordered_folders }
 
       context '.ordered_keys' do
         subject { instance.template_folders.ordered_keys }
@@ -115,16 +136,7 @@ RSpec.describe KBuilder::Configuration do
   describe '#clone' do
     let(:copy) { instance.clone }
 
-    let(:cfg) do
-      lambda { |config|
-        config.target_folders.add(:src, custom_target_folder1)
-        config.target_folders.add(:dst, custom_target_folder2)
-
-        config.template_folders.add(:global , custom_global_template_folder)
-        config.template_folders.add(:domain , custom_domain_template_folder)
-        config.template_folders.add(:app    , custom_template_folder)
-      }
-    end
+    include_context 'target + template configuration'
 
     before do
       copy.target_folders.add(:custom, '/custom')
