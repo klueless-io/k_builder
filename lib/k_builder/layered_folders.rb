@@ -68,9 +68,8 @@ module KBuilder
       @ordered_folders = orig.ordered_folders.clone
     end
 
-    # Add support for file_parts
-    def add(folder_key, folder)
-      folder = super(folder_key, folder)
+    def add(folder_key, *folder_parts)
+      folder = super(folder_key, *folder_parts)
 
       ordered_keys.prepend(folder_key)
       ordered_folders.prepend(folder)

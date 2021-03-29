@@ -6,6 +6,7 @@ RSpec.describe KBuilder::LayeredFolders do
   let(:fallback_folder) { '~/x' }
   let(:expected_fallback_folder) { File.expand_path(fallback_folder) }
   let(:app_template_folder) { File.join(sample_assets_folder, 'app-template') }
+  let(:app_template_abc_folder) { File.join(app_template_folder, 'a', 'b', 'c') }
   let(:domain_template_folder) { File.join(sample_assets_folder, 'domain-template') }
   let(:global_template_folder) { File.join(sample_assets_folder, 'global-template') }
   let(:global_template_shim_folder) { File.join(sample_assets_folder, 'global-shim-template') }
@@ -34,16 +35,18 @@ RSpec.describe KBuilder::LayeredFolders do
       instance.add(:global    , global_template_folder)
       instance.add(:domain    , domain_template_folder)
       instance.add(:app       , app_template_folder)
+      instance.add(:app_abc   , :app, 'a', 'b', 'c')
     end
 
     context '.ordered_folders' do
       subject { instance.ordered_folders }
 
       it { is_expected.not_to be_empty }
-      it { is_expected.to have_attributes(count: 4) }
+      it { is_expected.to have_attributes(count: 5) }
       it do
         is_expected
           .to include(
+            app_template_abc_folder,
             app_template_folder,
             domain_template_folder,
             global_template_folder,
@@ -56,8 +59,8 @@ RSpec.describe KBuilder::LayeredFolders do
       subject { instance.ordered_keys }
 
       it { is_expected.not_to be_empty }
-      it { is_expected.to have_attributes(count: 4) }
-      it { is_expected.to eq(%i[app domain global fallback]) }
+      it { is_expected.to have_attributes(count: 5) }
+      it { is_expected.to eq(%i[app_abc app domain global fallback]) }
     end
 
     describe '#find_file_folder' do
@@ -141,7 +144,7 @@ RSpec.describe KBuilder::LayeredFolders do
         context '.count' do
           subject { target.folders.count }
 
-          it { is_expected.to eq(4) }
+          it { is_expected.to eq(5) }
         end
 
         context '.folders' do
@@ -154,7 +157,7 @@ RSpec.describe KBuilder::LayeredFolders do
         context '.ordered_keys' do
           subject { target.ordered_keys }
 
-          it { is_expected.to eq(%i[app domain global fallback]) }
+          it { is_expected.to eq(%i[app_abc app domain global fallback]) }
         end
 
         context '.ordered_folders' do
@@ -176,19 +179,26 @@ RSpec.describe KBuilder::LayeredFolders do
         context '.count' do
           subject { target.folders.count }
 
-          it { is_expected.to eq(5) }
+          it { is_expected.to eq(6) }
         end
 
         context '.folders' do
           subject { target.folders }
 
-          it { is_expected.to have_key(:app).and have_key(:domain).and have_key(:global).and have_key(:fallback).and have_key(:custom) }
+          it do
+            is_expected.to have_key(:app)
+              .and have_key(:app_abc)
+              .and have_key(:domain)
+              .and have_key(:global)
+              .and have_key(:fallback)
+              .and have_key(:custom)
+          end
         end
 
         context '.ordered_keys' do
           subject { target.ordered_keys }
 
-          it { is_expected.to eq(%i[custom app domain global fallback]) }
+          it { is_expected.to eq(%i[custom app_abc app domain global fallback]) }
         end
 
         context '.ordered_folders' do
