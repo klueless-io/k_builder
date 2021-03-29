@@ -22,9 +22,38 @@ RSpec.describe KBuilder::NamedFolders do
   end
 
   describe '#add' do
-    subject { instance.add(:app, slide_folder) }
+    context 'when no folder supplied' do
+      subject { instance.add(:app) }
 
-    it { is_expected.to eq(File.expand_path(slide_folder)) }
+      it { expect { subject }.to raise_error(KBuilder::Error, 'No folder part provided') }
+    end
+
+    context 'when absolute folder' do
+      subject { instance.add(:app, target_folder) }
+
+      it { is_expected.to eq(target_folder) }
+    end
+
+    context 'when home folder (aka ~)' do
+      subject { instance.add(:app, slide_folder) }
+
+      it { is_expected.to eq(File.expand_path(slide_folder)) }
+    end
+
+    context 'when file parts' do
+      subject { instance.add(:app, target_folder, 'a', 'b') }
+
+      it { is_expected.to eq(File.join(target_folder, 'a', 'b')) }
+    end
+
+    context 'when file parts and first part is a lookup folder_key' do
+      subject do
+        instance.add(:app, target_folder, 'a')
+        instance.add(:abc, :app, 'b', 'c')
+      end
+
+      it { is_expected.to eq(File.join(target_folder, 'a', 'b', 'c')) }
+    end
 
     describe '.folders' do
       subject { instance.folders }

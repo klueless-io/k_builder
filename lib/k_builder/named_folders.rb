@@ -55,8 +55,9 @@ module KBuilder
     end
 
     # Add support for file_parts
-    def add(folder_key, folder)
+    def add(folder_key, *folder_parts)
       # get a predefined folder by symbol
+      folder = join_folder_parts(folder_parts)
       if folder.is_a?(Symbol)
         folder = get(folder)
       elsif folder.start_with?('~')
@@ -93,6 +94,20 @@ module KBuilder
     end
 
     private
+
+    def join_folder_parts(folder_parts)
+      raise KBuilder::Error, 'No folder part provided' if folder_parts.nil? || folder_parts.length.zero?
+
+      # If only one part, and that can be a folder or :folder_key, then just return it
+      return folder_parts.first if folder_parts.length == 1
+
+      folder_parts = folder_parts.map.with_index do |folder_part, index|
+        folder_part = get(folder_part) if index.zero? && folder_part.is_a?(Symbol)
+        folder_part
+      end
+
+      File.join(folder_parts)
+    end
 
     def guard_folder_key(folder_key)
       raise KBuilder::Error, "Folder not found, this folder key not found: #{folder_key}" unless folders.key?(folder_key)

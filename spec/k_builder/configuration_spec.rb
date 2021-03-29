@@ -100,7 +100,7 @@ RSpec.describe KBuilder::Configuration do
         it { is_expected.to be_empty }
       end
     end
-  
+
     context 'when configured' do
       include_context 'template configuration'
 
