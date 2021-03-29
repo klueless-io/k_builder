@@ -95,6 +95,7 @@ module KBuilder
 
       self
     end
+    alias touch add_file # it is expected that you would not supply any options, just a file name
 
     # Add content to the clipboard
     #
@@ -114,6 +115,14 @@ module KBuilder
       self
     end
     alias clipboard_copy add_clipboard
+
+    def vscode(*file_parts, folder: current_folder_key)
+      file = target_file(*file_parts, folder: folder)
+
+      rc "code #{file}"
+
+      self
+    end
 
     # ----------------------------------------------------------------------
     # Attributes: Think getter/setter
@@ -154,8 +163,28 @@ module KBuilder
     end
 
     # Get target file
-    def target_file(file_parts, folder: current_folder_key)
-      File.join(target_folder(folder), file_parts)
+    #
+    # If you provide a relative folder, then it will be relative to the :folder parameter
+    #
+    # If the :folder is not set, then it will be relative to the current folder
+    #
+    # @examples
+    #   target_file('abc.txt')
+    #   target_file('xyz/abc.txt')
+    #   target_file('xyz', 'abc.txt')
+    #
+    # If you provide an absolute folder, then it will ignore the :folder parameter
+    #
+    # @examples
+    #   target_file('/abc.txt')
+    #   target_file('/xyz/abc.txt')
+    #   target_file('/xyz', 'abc.txt')
+    def target_file(*file_parts, folder: current_folder_key)
+      # Absolute path
+      return File.join(*file_parts) if Pathname.new(file_parts.first).absolute?
+
+      # Relative to :folder
+      File.join(target_folder(folder), *file_parts)
     end
 
     # Template folder & Files

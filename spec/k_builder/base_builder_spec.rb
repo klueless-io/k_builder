@@ -214,40 +214,50 @@ RSpec.describe KBuilder::BaseBuilder do
       context 'with folder key supplied' do
         include_context 'basic configuration'
 
-        context 'when index.html' do
-          subject { instance.target_file('index.html', folder: :src) }
+        context 'relative files' do
+          context 'when simple file "index.html"' do
+            subject { instance.target_file('index.html', folder: :src) }
 
-          it { is_expected.to eq(File.join(target_folder, 'index.html')) }
+            it { is_expected.to eq(File.join(target_folder, 'index.html')) }
+          end
+
+          context 'when file is relative to folder "img/logo.png"' do
+            subject { instance.target_file('img/index.html', folder: :src) }
+
+            it { is_expected.to eq(File.join(target_folder, 'img/index.html')) }
+          end
+
+          context 'when file is relative to folder as file_parts "img", "logo.png"' do
+            subject { instance.target_file('img', 'logo.png', folder: :src) }
+
+            it { is_expected.to eq(File.join(target_folder, 'img/logo.png')) }
+          end
         end
 
-        context 'when img/logo.png' do
-          subject { instance.target_file('img/index.html', folder: :src) }
+        context 'files relative to folder' do
+          include_context 'complete configuration'
 
-          it { is_expected.to eq(File.join(target_folder, 'img/index.html')) }
+          context 'when index.html in default folder' do
+            subject { instance.target_file('index.html') }
+
+            it { is_expected.to eq(File.join(target_folder, 'index.html')) }
+          end
+
+          context 'when readme.md after change folder' do
+            before { instance.cd(:doc) }
+
+            subject { instance.target_file('readme.md') }
+
+            it { is_expected.to eq(File.join(target_documentation_folder, 'readme.md')) }
+          end
         end
 
-        context "when ['img', 'logo.png']" do
-          subject { instance.target_file(['img', 'logo.png'], folder: :src) }
+        context 'absolute files' do
+          context 'file is absolute "/a/b/c.txt"' do
+            subject { instance.target_file(File.join(target_documentation_folder, 'some-documentation_absolute.txt')) }
 
-          it { is_expected.to eq(File.join(target_folder, 'img/logo.png')) }
-        end
-      end
-
-      context 'with current folder' do
-        include_context 'complete configuration'
-
-        context 'when index.html in default folder' do
-          subject { instance.target_file('index.html') }
-
-          it { is_expected.to eq(File.join(target_folder, 'index.html')) }
-        end
-
-        context 'when readme.md after change folder' do
-          before { instance.cd(:doc) }
-
-          subject { instance.target_file('readme.md') }
-
-          it { is_expected.to eq(File.join(target_documentation_folder, 'readme.md')) }
+            it { is_expected.to eq(File.join(target_documentation_folder, 'some-documentation_absolute.txt')) }
+          end
         end
       end
     end
@@ -586,6 +596,30 @@ RSpec.describe KBuilder::BaseBuilder do
 
         is_expected.to eq(expected)
       end
+    end
+  end
+
+  describe '#vscode' do
+    include_context 'complete configuration'
+
+    context 'functional tests, do not run in production' do
+      # context 'relative file parts to current folder' do
+      #   subject { instance.cd(:src).vscode('config', 'some-file.txt') }
+
+      #   it { subject }
+      # end
+
+      # context 'relative file parts to different folder' do
+      #   subject { instance.vscode('some-documentation.txt', folder: :doc) }
+
+      #   it { subject }
+      # end
+
+      # context 'absolute file' do
+      #   subject { instance.vscode(File.join(target_documentation_folder, 'some-documentation_absolute.txt')) }
+
+      #   it { subject }
+      # end
     end
   end
 
