@@ -96,6 +96,25 @@ module KBuilder
       self
     end
 
+    # Add content to the clipboard
+    #
+    # @option opts [String] :content Supply the content that you want to write to the file
+    # @option opts [String] :template Supply the template that you want to write to the file, template will be processed  ('nobody') From address
+    # @option opts [String] :content_file File with content, file location is based on where the program is running
+    # @option opts [String] :template_file File with handlebars templated content that will be transformed, file location is based on the configured template_path
+    #
+    # Extra options will be used as data for templates, e.g
+    # @option opts [String] :to Recipient email
+    # @option opts [String] :body The email's body
+    def add_clipboard(**opts)
+      content = process_any_content(**opts)
+
+      IO.popen('pbcopy', 'w') { |f| f << content }
+
+      self
+    end
+    alias clipboard_copy add_clipboard
+
     # ----------------------------------------------------------------------
     # Attributes: Think getter/setter
     #
