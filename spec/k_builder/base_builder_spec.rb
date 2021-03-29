@@ -484,6 +484,17 @@ RSpec.describe KBuilder::BaseBuilder do
         end
       end
     end
+
+    fcontext '$T$ variable interpolation' do
+      let(:file) { 'my-file.txt' }
+
+      # $T_FILE$        = 'abc/xyz/deep-template.txt'
+      # $T_PATH$        = 'abc/xyz'
+      # $T_FILE_NAME$   = 'deep-template.txt'
+      let(:opts) { { template_file: ['abc', 'xyz', 'deep-template.txt'] } }
+
+      let(:target_file) { File.join(@temp_folder, file) }
+    end
   end
 
   describe '#add_clipboard' do
