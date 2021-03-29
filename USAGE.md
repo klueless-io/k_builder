@@ -55,26 +55,26 @@ TEXT
 
 builder = KBuilder::Builder.init
 
-builder
-  .add_file('main.rb', template_file: 'class.rb', name: 'main')
-  .add_file('person.rb',
-            template_file: 'model.rb',
-            name: 'person',
-            fields: %i[first_name last_name])
-  .add_file('address.rb',
-            template_file: 'model.rb',
-            name: 'address',
-            fields: %i[street1 street2 post_code state])
-  .add_file('configuration.log.txt',
-            template: template,
-            a: builder.template_folder,
-            b: builder.global_template_folder,
-            c: builder.target_folder)
-  .add_file('css/index.css',
-            template: '{{#each colors}} .{{.}} { color: {{.}} }  {{/each}}',
-            colors: ['red', 'blue', 'green'],
-            pretty: true)
-
+builder.add_file('main.rb', template_file: 'class.rb', name: 'main').add_file(
+  'person.rb',
+  template_file: 'model.rb', name: 'person', fields: %i[first_name last_name]
+).add_file(
+  'address.rb',
+  template_file: 'model.rb',
+  name: 'address',
+  fields: %i[street1 street2 post_code state]
+).add_file(
+  'configuration.log.txt',
+  template: template,
+  a: builder.template_folder,
+  b: builder.global_template_folder,
+  c: builder.target_folder
+).add_file(
+  'css/index.css',
+  template: '{{#each colors}} .{{.}} { color: {{.}} }  {{/each}}',
+  colors: %w[red blue green],
+  pretty: true
+)
 ```
 
 #### Folder Structure (after)
@@ -85,7 +85,7 @@ Folder structure after running the builder
 
 #### main.rb
 
-![main.rb](usage/_out1.png)
+![](usage/_out1.png)
 
 #### person.rb
 
@@ -93,12 +93,12 @@ Folder structure after running the builder
 
 #### address.rb
 
-![person.rb](usage/_out3.png)
+![](usage/_out3.png)
 
 #### configuration.log.txt
 
-![configuration.log.txt](usage/_out4.png)
+![](usage/_out4.png)
 
 #### css/index.css
 
-![css/index.css](usage/_out5.png)
+![](usage/_out5.png)
