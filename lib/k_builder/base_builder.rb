@@ -83,6 +83,7 @@ module KBuilder
     def add_file(file, **opts)
       full_file = target_file(file)
 
+      # Need logging options that can log these internal details
       FileUtils.mkdir_p(File.dirname(full_file))
 
       content = process_any_content(**opts)

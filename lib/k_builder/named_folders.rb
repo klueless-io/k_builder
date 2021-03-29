@@ -54,6 +54,7 @@ module KBuilder
       @current = folder_key
     end
 
+    # Add support for file_parts
     def add(folder_key, folder)
       # get a predefined folder by symbol
       if folder.is_a?(Symbol)
