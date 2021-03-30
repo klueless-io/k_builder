@@ -110,7 +110,15 @@ module KBuilder
     def add_clipboard(**opts)
       content = process_any_content(**opts)
 
-      IO.popen('pbcopy', 'w') { |f| f << content }
+      begin
+        IO.popen('pbcopy', 'w') { |f| f << content }
+      rescue Errno::ENOENT => e
+        if e.message == 'No such file or directory - pbcopy'
+          # May want to use this GEM in the future
+          # https://github.com/janlelis/clipboard
+          puts 'Clipboard paste is currently only supported on MAC'
+        end
+      end
 
       self
     end
