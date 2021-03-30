@@ -81,7 +81,7 @@ module KBuilder
     # @option opts [String] :to Recipient email
     # @option opts [String] :body The email's body
     def add_file(file, **opts)
-      full_file = target_file(file)
+      full_file = opts.key?(:folder_key) ? target_file(file, folder: opts[:folder_key]) : target_file(file)
 
       # Need logging options that can log these internal details
       FileUtils.mkdir_p(File.dirname(full_file))

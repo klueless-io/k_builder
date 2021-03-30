@@ -28,6 +28,7 @@ RSpec.describe KBuilder::BaseBuilder do
     let(:cfg) do
       lambda { |config|
         config.target_folders.add(:src, @temp_folder)
+        config.target_folders.add(:src_child, :src, 'child')
 
         config.template_folders.add(:global , global_template_folder)
         config.template_folders.add(:domain, domain_template_folder)
@@ -427,6 +428,15 @@ RSpec.describe KBuilder::BaseBuilder do
       it { is_expected.to eq(true) }
     end
 
+    context 'when :folder_key is specified' do
+      subject { File.exist?(target_file) }
+
+      let(:opts) { { folder_key: :src_child } }
+      let(:target_file) { File.join(@temp_folder, 'child', file) }
+
+      it { is_expected.to eq(true) }
+    end
+
     context 'validate file contents' do
       subject { File.read(target_file).strip }
 
@@ -485,7 +495,7 @@ RSpec.describe KBuilder::BaseBuilder do
       end
     end
 
-    fcontext '$T$ variable interpolation' do
+    context '$T$ variable interpolation' do
       let(:file) { 'my-file.txt' }
 
       # $T_FILE$        = 'abc/xyz/deep-template.txt'
