@@ -507,56 +507,56 @@ RSpec.describe KBuilder::BaseBuilder do
     end
   end
 
-  describe '#add_clipboard' do
-    include_context 'complete configuration'
+  describe '#add_clipboard (not supported in CI)' do
+    # include_context 'complete configuration'
 
-    before { instance.add_clipboard(**opts) }
+    # before { instance.add_clipboard(**opts) }
 
-    let(:opts) { {} }
+    # let(:opts) { {} }
 
-    context 'validate file contents' do
-      subject { pbpaste }
+    # context 'validate file contents' do
+    #   subject { pbpaste }
 
-      context 'when no options provided, this is the equivalent of writing empty' do
-        it { is_expected.to eq('') }
-      end
+    #   context 'when no options provided, this is the equivalent of writing empty' do
+    #     it { is_expected.to eq('') }
+    #   end
 
-      context 'when content: "I am some content"' do
-        let(:opts) { { content: 'I am some content' } }
+    #   context 'when content: "I am some content"' do
+    #     let(:opts) { { content: 'I am some content' } }
 
-        it { is_expected.to eq('I am some content') }
-      end
+    #     it { is_expected.to eq('I am some content') }
+    #   end
 
-      context 'when content: "Hello {{name}}"' do
-        let(:opts) { { content: 'Hello {{name}}' } }
+    #   context 'when content: "Hello {{name}}"' do
+    #     let(:opts) { { content: 'Hello {{name}}' } }
 
-        it { is_expected.to eq('Hello {{name}}') }
-      end
+    #     it { is_expected.to eq('Hello {{name}}') }
+    #   end
 
-      context 'when content_file: "some-text.txt"' do
-        let(:opts) { { content_file: File.join(sample_assets_folder, 'some-text.txt') } }
+    #   context 'when content_file: "some-text.txt"' do
+    #     let(:opts) { { content_file: File.join(sample_assets_folder, 'some-text.txt') } }
 
-        it { is_expected.to eq('Some text from a text file') }
-      end
+    #     it { is_expected.to eq('Some text from a text file') }
+    #   end
 
-      context 'when template: "Hello {{name}}"' do
-        let(:opts) { { template: 'Hello {{name}}', name: 'Dave' } }
+    #   context 'when template: "Hello {{name}}"' do
+    #     let(:opts) { { template: 'Hello {{name}}', name: 'Dave' } }
 
-        it { is_expected.to eq('Hello Dave') }
-      end
+    #     it { is_expected.to eq('Hello Dave') }
+    #   end
 
-      context 'when template_file: "template1.txt"' do
-        let(:opts) { { template_file: 'template1.txt', name: 'Dave in Local Template' } }
+    #   context 'when template_file: "template1.txt"' do
+    #     let(:opts) { { template_file: 'template1.txt', name: 'Dave in Local Template' } }
 
-        it { is_expected.to eq('App template 1 - Hello Dave in Local Template') }
-      end
+    #     it { is_expected.to eq('App template 1 - Hello Dave in Local Template') }
+    #   end
 
-      context 'when template_file: "template3.txt"' do
-        let(:opts) { { template_file: 'template3.txt', name: 'Dave in Global Template' } }
+    #   context 'when template_file: "template3.txt"' do
+    #     let(:opts) { { template_file: 'template3.txt', name: 'Dave in Global Template' } }
 
-        it { is_expected.to eq('Global template 3 - Hello Dave in Global Template') }
-      end
-    end
+    #     it { is_expected.to eq('Global template 3 - Hello Dave in Global Template') }
+    #   end
+    # end
   end
 
   describe '#run_prettier' do
