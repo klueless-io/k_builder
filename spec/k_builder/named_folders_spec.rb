@@ -268,8 +268,8 @@ RSpec.describe KBuilder::NamedFolders do
 
       it do
         is_expected
-          .to  include(app: '/Users/davidcruwys/dev/kgems/k_builder/spec/sample-assets/target')
-          .and include(webpack: '/Users/davidcruwys/dev/kgems/k_builder/spec/sample-assets/target/config')
+          .to  include(app: target_folder)
+          .and include(webpack: webpack_folder)
       end
     end
   end
