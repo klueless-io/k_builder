@@ -73,6 +73,9 @@ Layout/EmptyLineBetweenDefs:
   Exclude:
     - "**/spec/**/*"
 
+Style/Documentation:
+  Enabled: false
+
 Lint/AmbiguousBlockAssociation:
   Exclude:
     - "**/spec/**/*"

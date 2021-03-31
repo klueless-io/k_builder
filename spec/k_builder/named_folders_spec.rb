@@ -93,29 +93,6 @@ RSpec.describe KBuilder::NamedFolders do
         end
       end
     end
-
-    #   folders = NamedFolders.new
-    #   folders.add(:csharp       , '~/dev/csharp/cool-project')
-    #   folders.add(:package_json , :csharp)
-    #   folders.add(:webpack      , folders.join(:csharp, 'config'))
-    #   folders.add(:builder      , folders.join(:csharp, 'builder'))
-    #   folders.add(:slides       , '~/doc/csharp/cool-project')
-
-    # context '.folders' do
-    #   subject { instance.folders }
-
-    #   it { is_expected.not_to be_empty }
-    #   it { is_expected.to have_attributes(count: 4) }
-    #   it do
-    #     is_expected
-    #       .to include(
-    #         File.expand_path(tilda_folder),
-    #         app_template_folder,
-    #         domain_template_folder,
-    #         global_template_folder
-    #       )
-    #   end
-    # end
   end
 
   describe '#join' do
