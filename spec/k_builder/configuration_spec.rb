@@ -26,6 +26,12 @@ RSpec.describe KBuilder::Configuration do
     builder_module.reset
   end
 
+  # context 'debug' do
+  #   include_context 'target + template configuration'
+
+  #   it { builder_module.configuration.debug }
+  # end
+
   shared_context 'target configuration' do
     let(:cfg) do
       lambda { |config|

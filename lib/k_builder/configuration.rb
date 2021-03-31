@@ -42,19 +42,22 @@ module KBuilder
 
     # rubocop:disable Metrics/AbcSize
     def debug
-      puts '-' * 120
-      puts 'kbuilder base configuration'
+      L.subheading 'kbuilder base configuration'
 
-      puts 'target_folders'
+      L.section_heading 'target_folders'
       target_folders.folders.each_key do |key|
         folder = target_folders.folders[key]
-        kv key.to_s, folder
+        L.kv key.to_s, folder
       end
+      L.info ''
 
-      puts 'template folders (search order)'
-      template_folders.ordered_folders.each do |folder|
-        puts folder.to_s
+      L.section_heading 'template folders (search order)'
+
+      template_folders.ordered_keys.each do |key|
+        folder = template_folders.folders[key]
+        L.kv key.to_s, folder
       end
+      ''
     end
     # rubocop:enable Metrics/AbcSize
   end
