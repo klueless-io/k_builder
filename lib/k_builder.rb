@@ -26,3 +26,5 @@ module KBuilder
 end
 
 L = KBuilder.configure_logger
+
+puts "KBuilder::Version: #{KBuilder::VERSION}" if ENV['KLUE_DEBUG']&.to_s&.downcase == 'true'
