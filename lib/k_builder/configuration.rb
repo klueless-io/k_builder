@@ -21,6 +21,8 @@ module KBuilder
 
   # Configuration class
   class Configuration < BaseConfiguration
+    include Logging
+
     attr_accessor :target_folders
     attr_accessor :template_folders
 
@@ -42,20 +44,20 @@ module KBuilder
 
     # rubocop:disable Metrics/AbcSize
     def debug
-      L.subheading 'kbuilder base configuration'
+      log.subheading 'kbuilder base configuration'
 
-      L.section_heading 'target_folders'
+      log.section_heading 'target_folders'
       target_folders.folders.each_key do |key|
         folder = target_folders.folders[key]
-        L.kv key.to_s, folder
+        log.kv key.to_s, folder
       end
-      L.info ''
+      log.info ''
 
-      L.section_heading 'template folders (search order)'
+      log.section_heading 'template folders (search order)'
 
       template_folders.ordered_keys.each do |key|
         folder = template_folders.folders[key]
-        L.kv key.to_s, folder
+        log.kv key.to_s, folder
       end
       ''
     end
