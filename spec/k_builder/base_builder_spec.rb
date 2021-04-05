@@ -199,7 +199,7 @@ RSpec.describe KBuilder::BaseBuilder do
       context 'when unknown' do
         subject { instance.target_folder(:yyy) }
 
-        it { expect { subject }.to raise_error KBuilder::Error }
+        it { expect { subject }.to raise_error KType::Error }
       end
 
       context 'when known' do
@@ -276,7 +276,7 @@ RSpec.describe KBuilder::BaseBuilder do
       context 'when unknown' do
         subject { instance.get_template_folder(:yyy) }
 
-        it { expect { subject }.to raise_error KBuilder::Error }
+        it { expect { subject }.to raise_error KType::Error }
       end
     end
 
