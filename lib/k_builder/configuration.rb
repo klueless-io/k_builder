@@ -21,7 +21,7 @@ module KBuilder
 
   # Configuration class
   class Configuration < BaseConfiguration
-    include Logging
+    include KLog::Logging
 
     attr_accessor :target_folders
     attr_accessor :template_folders
@@ -31,8 +31,8 @@ module KBuilder
       # @target_folder = Dir.getwd
       # @template_folder = File.join(Dir.getwd, '.templates')
       # @global_template_folder = nil
-      @target_folders = NamedFolders.new
-      @template_folders = LayeredFolders.new
+      @target_folders = KType::NamedFolders.new
+      @template_folders = KType::LayeredFolders.new
     end
 
     def initialize_copy(orig)
