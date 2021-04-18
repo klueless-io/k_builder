@@ -19,11 +19,17 @@ module KBuilder
     yield(configuration)
   end
 
+  # Does this class need to move out into k_types?
+  # It is being used with k_manager in a similar fashion
+  #
   # Configuration class
   class Configuration < BaseConfiguration
     include KLog::Logging
 
+    # Target folders provide a set named folders that can be written to
     attr_accessor :target_folders
+
+    # Template folders provides layered folders that templates can exist within
     attr_accessor :template_folders
 
     def initialize
