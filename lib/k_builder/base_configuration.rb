@@ -3,17 +3,25 @@
 module KBuilder
   # Base configuration object for all k_builder* GEM
   class BaseConfiguration
-    def self.attach_to(klass_me, klass_target, accessor_name)
-      # Create a memoized getter to an instance of the attaching class (:klass_me)
+    class << self
+      # Attach a child configuration with it's own settings to a parent configuration
       #
-      # def third_party
-      #   @third_party ||= KBuilder::ThirdPartyGem::Configuration.new
-      # end
-      klass_target.send(:define_method, accessor_name) do
-        return instance_variable_get("@#{accessor_name}") if instance_variable_defined?("@#{accessor_name}")
+      # @param [Class] klass_child what class would you like as the child
+      # @param [Class] klass_parent what class would you like to extend with a new child configuration
+      # @param [Symbol] accessor_name what is the name of the accessor that you are adding
+      def attach_config_to_parent(klass_child, klass_parent, accessor_name)
+        # Create a memoized getter to an instance of the attaching class (:klass_child)
+        #
+        # def third_party
+        #   @third_party ||= KBuilder::ThirdPartyGem::Configuration.new
+        # end
+        klass_parent.send(:define_method, accessor_name) do
+          return instance_variable_get("@#{accessor_name}") if instance_variable_defined?("@#{accessor_name}")
 
-        instance_variable_set("@#{accessor_name}", klass_me.new)
+          instance_variable_set("@#{accessor_name}", klass_child.new)
+        end
       end
+      alias attach_to attach_config_to_parent
     end
 
     # move out into module
