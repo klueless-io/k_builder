@@ -37,6 +37,7 @@ module KBuilder
       hash
     end
 
+    # This code is being moved into k_util (data)
     # Any basic (aka primitive) type
     def basic_type?(value)
       value.is_a?(String) ||
