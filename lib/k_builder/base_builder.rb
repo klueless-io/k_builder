@@ -62,6 +62,8 @@ module KBuilder
     def debug
       log.subheading 'kbuilder'
 
+      log.kv 'current folder key' , current_folder_key
+      log.kv 'current folder'     , target_folder
       target_folders.debug(title: 'target_folders')
 
       log.info ''
