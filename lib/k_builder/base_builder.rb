@@ -8,6 +8,8 @@ module KBuilder
   #             Setter methods (are NOT fluent) can be created as needed
   #             these methods would not be prefixed with the set_
   class BaseBuilder
+    include KLog::Logging
+
     attr_reader :configuration
 
     attr_accessor :target_folders
@@ -57,6 +59,17 @@ module KBuilder
       }
     end
 
+    def debug
+      log.subheading 'kbuilder'
+
+      target_folders.debug(title: 'target_folders')
+
+      log.info ''
+
+      template_folders.debug(title: 'template folders (search order)')
+      ''
+    end
+
     # ----------------------------------------------------------------------
     # Fluent interface
     # ----------------------------------------------------------------------
@@ -92,6 +105,7 @@ module KBuilder
 
       # Prettier needs to work with the original file name
       run_prettier file if opts.key?(:pretty)
+      # Need support for rubocop -a
 
       self
     end
@@ -234,9 +248,19 @@ module KBuilder
 
       return unless opts[:content_file]
 
-      cf = opts[:content_file]
+      # NOTE: when using content file, you still want to search for it in the template folders, I THINK?
+      cf = find_template_file(opts[:content_file])
 
-      return "Content not found: #{File.expand_path(cf)}" unless File.exist?(cf)
+      return "content not found: #{opts[:content_file]}" if cf.nil?
+
+      # cf = opts[:content_file]
+
+      # unless File.exist?(cf)
+      #   cf_from_template_folders = find_template_file(cf)
+      #   return "Content not found: #{File.expand_path(cf)}" unless File.exist?(cf_from_template_folders)
+
+      #   cf = cf_from_template_folders
+      # end
 
       File.read(cf)
     end
@@ -298,6 +322,8 @@ module KBuilder
 
       puts build_command
 
+      # need to support the fork process options as I was not able to run
+      # k_builder_watch -n because it hid all the following output
       system(build_command)
     end
     alias rc run_command

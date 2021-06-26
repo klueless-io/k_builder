@@ -48,25 +48,15 @@ module KBuilder
       @template_folders = orig.template_folders.clone
     end
 
-    # rubocop:disable Metrics/AbcSize
     def debug
       log.subheading 'kbuilder base configuration'
 
-      log.section_heading 'target_folders'
-      target_folders.folders.each_key do |key|
-        folder = target_folders.folders[key]
-        log.kv key.to_s, folder
-      end
+      target_folders.debug(title: 'target_folders')
+
       log.info ''
 
-      log.section_heading 'template folders (search order)'
-
-      template_folders.ordered_keys.each do |key|
-        folder = template_folders.folders[key]
-        log.kv key.to_s, folder
-      end
+      template_folders.debug(title: 'template folders (search order)')
       ''
     end
-    # rubocop:enable Metrics/AbcSize
   end
 end
