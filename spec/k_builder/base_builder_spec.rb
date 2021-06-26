@@ -6,7 +6,7 @@ RSpec.describe KBuilder::BaseBuilder do
   let(:cfg) { ->(config) {} }
 
   let(:sample_assets_folder) { File.join(Dir.getwd, 'spec', 'sample-assets') }
-  let(:sample_file) { File.join(sample_assets_folder, 'some-text.txt') }
+  let(:sample_file) { 'some-text.txt' } # { File.join(sample_assets_folder, 'some-text.txt') }
 
   let(:target_folder) { File.join(sample_assets_folder, 'target') }
   let(:target_documentation_folder) { File.join(sample_assets_folder, 'target-documentation') }
@@ -71,6 +71,12 @@ RSpec.describe KBuilder::BaseBuilder do
 
       it { is_expected.not_to be_nil }
     end
+  end
+
+  context 'debug' do
+    include_context 'complete configuration'
+
+    it { instance.debug }
   end
 
   describe '#init' do
@@ -313,6 +319,8 @@ RSpec.describe KBuilder::BaseBuilder do
     end
 
     context 'with :content_file' do
+      include_context 'complete configuration'
+
       let(:opts) { { content_file: sample_file } }
 
       it { is_expected.to eq('Some text from a text file') }
@@ -457,7 +465,7 @@ RSpec.describe KBuilder::BaseBuilder do
       end
 
       context 'when content_file: "some-text.txt"' do
-        let(:opts) { { content_file: File.join(sample_assets_folder, 'some-text.txt') } }
+        let(:opts) { { content_file: sample_file } }
 
         it { is_expected.to eq('Some text from a text file') }
       end

@@ -26,12 +26,6 @@ RSpec.describe KBuilder::Configuration do
     builder_module.reset
   end
 
-  # context 'debug' do
-  #   include_context 'target + template configuration'
-
-  #   it { builder_module.configuration.debug }
-  # end
-
   shared_context 'target configuration' do
     let(:cfg) do
       lambda { |config|
@@ -62,6 +56,12 @@ RSpec.describe KBuilder::Configuration do
         config.template_folders.add(:app    , custom_template_folder)
       }
     end
+  end
+
+  context 'debug' do
+    include_context 'target + template configuration'
+
+    it { builder_module.configuration.debug }
   end
 
   describe '.target_folders' do

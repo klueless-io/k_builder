@@ -1,0 +1,1 @@
+content not found: /Users/davidcruwys/dev/kgems/k_builder/spec/sample-assets/some-text.txt
