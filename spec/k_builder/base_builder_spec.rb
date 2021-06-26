@@ -22,6 +22,17 @@ RSpec.describe KBuilder::BaseBuilder do
     builder_module.reset
   end
 
+  shared_context 'temp_dir' do
+    include_context :use_temp_folder
+
+    let(:cfg) do
+      lambda { |config|
+        config.target_folders.add(:src, @temp_folder)
+        config.target_folders.add(:src_child, :src, 'child')
+      }
+    end
+  end
+
   shared_context 'temp_dir + templates configuration' do
     include_context :use_temp_folder
 
@@ -500,6 +511,44 @@ RSpec.describe KBuilder::BaseBuilder do
 
           is_expected.to eq(expected)
         end
+      end
+    end
+
+    describe '#make_folder' do
+      include_context 'temp_dir'
+
+      subject { Dir.exist?(expected_path) }
+
+      before { instance.make_folder(folder_key, sub_path: sub_path) }
+
+      let(:folder_key) { nil }
+      let(:sub_path) { nil }
+      let(:expected_path) { @temp_folder }
+
+      context 'when current folder_key' do
+        it { is_expected.to be_truthy }
+      end
+
+      context 'when subpath for current folder_key' do
+        let(:expected_path) { File.join(@temp_folder, sub_path) }
+        let(:sub_path) { 'xyz' }
+
+        it { is_expected.to be_truthy }
+      end
+
+      context 'when changing folder_key' do
+        let(:folder_key) { :src_child }
+        let(:expected_path) { File.join(@temp_folder, 'child') }
+
+        it { is_expected.to be_truthy }
+      end
+
+      context 'when changing folder_key and adding subpath' do
+        let(:folder_key) { :src_child }
+        let(:sub_path) { 'abc/xyz' }
+        let(:expected_path) { File.join(@temp_folder, 'child', sub_path) }
+
+        it { is_expected.to be_truthy }
       end
     end
 
