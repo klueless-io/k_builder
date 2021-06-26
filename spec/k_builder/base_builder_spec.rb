@@ -84,7 +84,7 @@ RSpec.describe KBuilder::BaseBuilder do
     end
   end
 
-  context 'debug' do
+  fcontext 'debug' do
     include_context 'complete configuration'
 
     it { instance.debug }
