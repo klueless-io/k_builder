@@ -94,6 +94,7 @@ module KBuilder
     # @option opts [String] :to Recipient email
     # @option opts [String] :body The email's body
     def add_file(file, **opts)
+      # move to command
       full_file = opts.key?(:folder_key) ? target_file(file, folder: opts[:folder_key]) : target_file(file)
 
       # Need logging options that can log these internal details
@@ -111,6 +112,16 @@ module KBuilder
     end
     alias touch add_file # it is expected that you would not supply any options, just a file name
 
+    def make_folder(folder_key = nil, sub_path: nil)
+      folder_key  = current_folder_key if folder_key.nil?
+      folder      = target_folder(folder_key)
+      folder      = File.join(folder, sub_path) unless sub_path.nil?
+
+      FileUtils.mkdir_p(folder)
+
+      self
+    end
+
     # Add content to the clipboard
     #
     # @option opts [String] :content Supply the content that you want to write to the file
@@ -122,6 +133,7 @@ module KBuilder
     # @option opts [String] :to Recipient email
     # @option opts [String] :body The email's body
     def add_clipboard(**opts)
+      # move to command
       content = process_any_content(**opts)
 
       begin
@@ -139,6 +151,7 @@ module KBuilder
     alias clipboard_copy add_clipboard
 
     def vscode(*file_parts, folder: current_folder_key)
+      # move to command
       file = target_file(*file_parts, folder: folder)
 
       rc "code #{file}"
