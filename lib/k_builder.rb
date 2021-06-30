@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'rubocop'
+
 require 'k_log'
 require 'k_util'
 require 'k_type'
