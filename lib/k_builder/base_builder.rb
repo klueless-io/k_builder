@@ -320,6 +320,17 @@ module KBuilder
       Handlebars::Helpers::Template.render(template_content, opts) unless template_content.nil?
     end
 
+    def run_cop(file, auto_safe: false, auto_all: false)
+      cli = RuboCop::CLI.new
+      opts = ['--format', 'simple', file]
+      opts.prepend('-a') if auto_safe
+      opts.prepend('-A') if auto_all
+
+      cli.run(opts)
+    end
+
+    # Need to handle absolute files, see
+    # /Users/davidcruwys/dev/printspeak/reference_application/printspeak-domain/.builders/presentation/presentation_builder/commands/copy_ruby_resource_command.rb
     def run_prettier(file, log_level: :log)
       # command = "prettier --check #{file} --write #{file}"
       command = "npx prettier --loglevel #{log_level} --write #{file}"
