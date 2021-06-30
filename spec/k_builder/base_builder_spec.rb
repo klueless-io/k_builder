@@ -84,11 +84,11 @@ RSpec.describe KBuilder::BaseBuilder do
     end
   end
 
-  fcontext 'debug' do
-    include_context 'complete configuration'
+  # context 'debug' do
+  #   include_context 'complete configuration'
 
-    it { instance.debug }
-  end
+  #   it { instance.debug }
+  # end
 
   describe '#init' do
     subject { instance }
@@ -616,6 +616,70 @@ RSpec.describe KBuilder::BaseBuilder do
     # end
   end
 
+  describe '#run_cop' do
+    include_context 'temp_dir + templates configuration'
+
+    subject { File.read(target_file).strip }
+
+    before do
+      instance
+        .add_file(file_name, content: content)
+        .run_cop(target_file, auto_safe: auto_safe, auto_all: auto_all)
+    end
+
+    let(:target_file) { File.join(@temp_folder, file_name) }
+    let(:file_name) { 'make-pretty.rb' }
+    let(:auto_safe) { false }
+    let(:auto_all) { false }
+    let(:content) { "class David\ndef initialize(abc); @abc=abc; end\nend" }
+
+    context 'when log only' do
+      it {
+        expected = <<~RUBY.strip
+          class David
+          def initialize(abc); @abc=abc; end
+          end
+        RUBY
+
+        is_expected.to eq(expected)
+      }
+    end
+
+    context 'when safe auto fix (-a)' do
+      let(:auto_safe) { true }
+
+      it {
+        expected = <<~RUBY.strip
+          class David
+            def initialize(abc)
+              @abc = abc
+            end
+          end
+        RUBY
+
+        is_expected.to eq(expected)
+      }
+    end
+
+    context 'when safe auto fix (-A)' do
+      let(:auto_all) { true }
+
+      it {
+        expected = <<~RUBY.strip
+          # frozen_string_literal: true
+
+          class David
+            def initialize(abc)
+              @abc = abc
+            end
+          end
+        RUBY
+
+        is_expected.to eq(expected)
+      }
+    end
+  end
+
   describe '#run_prettier' do
     include_context 'temp_dir + templates configuration'
 
@@ -656,6 +720,24 @@ RSpec.describe KBuilder::BaseBuilder do
             console.log("was here");
           }
         JAVASCRIPT
+
+        is_expected.to eq(expected)
+      }
+    end
+
+    # NOTE: it is better to use cop for ruby files
+    context 'when rb file' do
+      let(:file_name) { 'make-pretty.rb' }
+      let(:content) { 'class David; def initialize(abc); @abc=abc; end; end;' }
+
+      it {
+        expected = <<~RUBY.strip
+          class David
+            def initialize(abc)
+              @abc = abc
+            end
+          end
+        RUBY
 
         is_expected.to eq(expected)
       }
