@@ -320,13 +320,11 @@ module KBuilder
       Handlebars::Helpers::Template.render(template_content, opts) unless template_content.nil?
     end
 
-    def run_cop(file, auto_safe: false, auto_all: false)
-      cli = RuboCop::CLI.new
-      opts = ['--format', 'simple', file]
-      opts.prepend('-a') if auto_safe
-      opts.prepend('-A') if auto_all
+    def run_cop(file, **opts)
+      command = Commands::RuboCopCommand.new(file, builder: self, **opts)
+      command.execute
 
-      cli.run(opts)
+      self
     end
 
     # Need to handle absolute files, see
