@@ -55,7 +55,7 @@ module KBuilder
         cli_options << '-a' if fix_safe
         cli_options << '-A' if fix_unsafe
         cli_options << '--config' << rubo_config_file if rubo_config_file
-        cli_options << '--out' << '~/last_cop.txt' unless show_console
+        cli_options << '--out' << File.expand_path('~/last_cop.txt') unless show_console
         cli_options << file_pattern
         cli_options
       end
