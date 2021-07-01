@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
 module KBuilder
-  VERSION = '0.0.61'
+  VERSION = '0.0.62'
 end

@@ -1,0 +1,7 @@
+# NOTE: This rubocop.yml is specifically for the presentation
+Layout/LineLength: # for Rubocop >= 0.78.0
+  Max: 80
+
+
+Lint/UnusedMethodArgument:
+  Enabled: false

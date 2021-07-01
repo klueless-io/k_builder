@@ -624,13 +624,13 @@ RSpec.describe KBuilder::BaseBuilder do
     before do
       instance
         .add_file(file_name, content: content)
-        .run_cop(target_file, auto_safe: auto_safe, auto_all: auto_all)
+        .run_cop(target_file, fix_safe: fix_safe, fix_unsafe: fix_unsafe)
     end
 
     let(:target_file) { File.join(@temp_folder, file_name) }
     let(:file_name) { 'make-pretty.rb' }
-    let(:auto_safe) { false }
-    let(:auto_all) { false }
+    let(:fix_safe) { false }
+    let(:fix_unsafe) { false }
     let(:content) { "class David\ndef initialize(abc); @abc=abc; end\nend" }
 
     context 'when log only' do
@@ -646,7 +646,7 @@ RSpec.describe KBuilder::BaseBuilder do
     end
 
     context 'when safe auto fix (-a)' do
-      let(:auto_safe) { true }
+      let(:fix_safe) { true }
 
       it {
         expected = <<~RUBY.strip
@@ -662,7 +662,7 @@ RSpec.describe KBuilder::BaseBuilder do
     end
 
     context 'when safe auto fix (-A)' do
-      let(:auto_all) { true }
+      let(:fix_unsafe) { true }
 
       it {
         expected = <<~RUBY.strip
