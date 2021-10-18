@@ -23,6 +23,8 @@ files_changed -= ['Gemfile']
 files_changed -= ['Gemfile.lock']
 files_changed -= ['.gitignore']
 files_changed -= ['README.md']
+files_changed -= ['lib/k_builder/assets/highlight.min.js']
+files_changed -= ['spec/k_builder/base_builder_spec.rb']
 
 files_changed = files_changed.reject { |f| f.downcase.end_with?('.json') }
 files_changed = files_changed.reject { |f| f.downcase.end_with?('.yml') }
