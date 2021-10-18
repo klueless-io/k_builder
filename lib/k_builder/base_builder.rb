@@ -441,7 +441,7 @@ module KBuilder
     end
 
     def mkdir_p(folder)
-      @last_output_folder = FileUtils.mkdir_p(folder)
+      @last_output_folder = FileUtils.mkdir_p(folder).first
     end
   end
 end
