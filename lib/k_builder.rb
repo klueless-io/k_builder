@@ -10,8 +10,11 @@ require 'k_builder/base_builder'
 require 'k_builder/base_configuration'
 require 'k_builder/configuration'
 require 'k_builder/file_segments'
+
+# should commands be in their own gem?
 require 'k_builder/commands/base_command'
 require 'k_builder/commands/rubo_cop_command'
+require 'k_builder/commands/code_syntax_highlighter_command'
 
 require 'handlebars/helpers/template'
 

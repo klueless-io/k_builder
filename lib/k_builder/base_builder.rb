@@ -13,8 +13,12 @@ module KBuilder
     attr_reader :configuration
 
     attr_accessor :target_folders
-
     attr_accessor :template_folders
+
+    attr_accessor :last_output_file
+    attr_accessor :last_output_folder
+    # attr_accessor :last_template
+    attr_accessor :last_template_file
 
     # Factory method that provides a builder for a specified structure
     # runs through a configuration block and then builds the final structure
@@ -59,6 +63,7 @@ module KBuilder
       }
     end
 
+    # rubocop:disable Metrics/AbcSize
     def debug
       log.subheading 'kbuilder'
 
@@ -69,8 +74,16 @@ module KBuilder
       log.info ''
 
       template_folders.debug(title: 'template folders (search order)')
+
+      log.info ''
+      log.kv 'last output file'     , last_output_file
+      log.kv 'last output folder'   , last_output_folder
+      # log.kv 'last template'        , last_template
+      log.kv 'last template file'   , last_template_file
+
       ''
     end
+    # rubocop:enable Metrics/AbcSize
 
     # ----------------------------------------------------------------------
     # Fluent interface
@@ -95,23 +108,30 @@ module KBuilder
     # Extra options will be used as data for templates, e.g
     # @option opts [String] :to Recipient email
     # @option opts [String] :body The email's body
+    # rubocop:disable Metrics/AbcSize
     def add_file(file, **opts)
       # move to command
       full_file = opts.key?(:folder_key) ? target_file(file, folder: opts[:folder_key]) : target_file(file)
 
       # Need logging options that can log these internal details
-      FileUtils.mkdir_p(File.dirname(full_file))
+      mkdir_p(File.dirname(full_file))
 
       content = process_any_content(**opts)
 
-      File.write(full_file, content)
+      file_write(full_file, content, on_exist: opts[:on_exist])
 
       # Prettier needs to work with the original file name
-      run_prettier file if opts.key?(:pretty)
+      run_prettier file                   if opts.key?(:pretty)
       # Need support for rubocop -a
+      open_file(last_output_file)         if opts.key?(:open)
+      open_file(last_template_file)       if opts.key?(:open_template)
+      browse_file(last_output_file)       if opts.key?(:browse)
+      pause(opts[:pause])                 if opts[:pause]
 
       self
     end
+    # rubocop:enable Metrics/AbcSize
+
     alias touch add_file # it is expected that you would not supply any options, just a file name
 
     def make_folder(folder_key = nil, sub_path: nil)
@@ -119,7 +139,7 @@ module KBuilder
       folder      = target_folder(folder_key)
       folder      = File.join(folder, sub_path) unless sub_path.nil?
 
-      FileUtils.mkdir_p(folder)
+      mkdir_p(folder)
 
       self
     end
@@ -140,6 +160,8 @@ module KBuilder
 
       begin
         IO.popen('pbcopy', 'w') { |f| f << content }
+
+        open_file(last_template_file) if opts.key?(:open_template)
       rescue Errno::ENOENT => e
         if e.message == 'No such file or directory - pbcopy'
           # May want to use this GEM in the future
@@ -152,11 +174,48 @@ module KBuilder
     end
     alias clipboard_copy add_clipboard
 
-    def vscode(*file_parts, folder: current_folder_key)
+    def vscode(*file_parts, folder: current_folder_key, file: nil)
       # move to command
-      file = target_file(*file_parts, folder: folder)
+      file = target_file(*file_parts, folder: folder) if file.nil?
 
       rc "code #{file}"
+
+      self
+    end
+
+    def browse(*file_parts, folder: current_folder_key, file: nil)
+      # move to command
+      file = target_file(*file_parts, folder: folder) if file.nil?
+
+      rc "open -a \"Google Chrome\" #{file}"
+
+      self
+    end
+
+    def open_file(file)
+      if file.nil?
+        log.warn('open_file will not open when file is nil')
+        return self
+      end
+
+      vscode(file: file)
+
+      self
+    end
+
+    def browse_file(file)
+      if file.nil?
+        log.warn('browse_file will not browse when file is nil')
+        return self
+      end
+
+      browse(file: file)
+
+      self
+    end
+
+    def pause(seconds = 1)
+      sleep(seconds)
 
       self
     end
@@ -242,7 +301,8 @@ module KBuilder
     # Gets a template_file relative to the template folder, looks first in
     # local template folder and if not found, looks in global template folder
     def find_template_file(file_parts)
-      template_folders.find_file(file_parts)
+      self.last_template_file = template_folders.find_file(file_parts)
+      last_template_file
     end
 
     # Building content from templates
@@ -267,15 +327,6 @@ module KBuilder
       cf = find_template_file(opts[:content_file])
 
       return "content not found: #{opts[:content_file]}" if cf.nil?
-
-      # cf = opts[:content_file]
-
-      # unless File.exist?(cf)
-      #   cf_from_template_folders = find_template_file(cf)
-      #   return "Content not found: #{File.expand_path(cf)}" unless File.exist?(cf_from_template_folders)
-
-      #   cf = cf_from_template_folders
-      # end
 
       File.read(cf)
     end
@@ -340,7 +391,7 @@ module KBuilder
       # Deep path create if needed
       tf = target_folder
 
-      FileUtils.mkdir_p(tf)
+      mkdir_p(tf)
 
       build_command = "cd #{tf} && #{command}"
 
@@ -351,5 +402,46 @@ module KBuilder
       system(build_command)
     end
     alias rc run_command
+
+    def file_write(file, content, on_exist: :skip)
+      self.last_output_file = file # if file not found, we still want to record this as the last_output_file
+
+      not_found = !File.exist?(file)
+
+      if not_found
+        File.write(file, content)
+        return
+      end
+
+      return if %i[skip ignore].include?(on_exist)
+
+      if %i[overwrite write].include?(on_exist)
+        File.write(file, content)
+        return
+      end
+
+      return unless on_exist == :compare
+
+      vscompare(file, content)
+    end
+
+    def vscompare(file, content)
+      # need to use some sort of caching folder for this
+      ext = File.extname(file)
+      fn  = File.basename(file, ext)
+      temp_file = Tempfile.new([fn, ext])
+
+      temp_file.write(content)
+      temp_file.close
+
+      return if File.read(file) == content
+
+      system("code -d #{file} #{temp_file.path}")
+      sleep 2
+    end
+
+    def mkdir_p(folder)
+      @last_output_folder = FileUtils.mkdir_p(folder)
+    end
   end
 end
