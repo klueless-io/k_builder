@@ -49,11 +49,11 @@ module KBuilder
     end
 
     def debug
-      log.subheading 'kbuilder base configuration'
+      log.section_heading 'kbuilder base configuration'
 
       target_folders.debug(title: 'target_folders')
 
-      log.info ''
+      # log.info ''
 
       template_folders.debug(title: 'template folders (search order)')
       ''

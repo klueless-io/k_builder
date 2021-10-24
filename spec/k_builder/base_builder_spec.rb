@@ -462,7 +462,7 @@ RSpec.describe KBuilder::BaseBuilder do
     context 'file is created' do
       subject { File.exist?(target_file) }
 
-      it { is_expected.to eq(true) }
+      it { is_expected.to be_truthy }
     end
 
     context 'when :folder_key is specified' do
@@ -471,7 +471,7 @@ RSpec.describe KBuilder::BaseBuilder do
       let(:opts) { { folder_key: :src_child } }
       let(:target_file) { File.join(@temp_folder, 'child', file) }
 
-      it { is_expected.to eq(true) }
+      it { is_expected.to be_truthy }
     end
 
     context 'validate file contents' do
@@ -579,6 +579,27 @@ RSpec.describe KBuilder::BaseBuilder do
       let(:opts) { { template_file: ['abc', 'xyz', 'deep-template.txt'] } }
 
       let(:target_file) { File.join(@temp_folder, file) }
+    end
+  end
+
+  describe '#delete_file' do
+    include_context 'temp_dir + templates configuration'
+
+    before { instance.add_file(file) }
+
+    let(:file) { 'my-file.txt' }
+    let(:target_file) { File.join(@temp_folder, file) }
+
+    context 'when file exists' do
+      subject { File.exist?(target_file) }
+
+      it { is_expected.to be_truthy }
+
+      context 'after delete_file' do
+        before { instance.delete_file(file) }
+
+        it { is_expected.to be_falsey }
+      end
     end
   end
 
