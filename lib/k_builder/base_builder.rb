@@ -7,6 +7,15 @@ module KBuilder
   #             Getter methods (are NOT fluent) and return the stored value
   #             Setter methods (are NOT fluent) can be created as needed
   #             these methods would not be prefixed with the set_
+
+  # process_any_content(content: 'abc')
+  # process_any_content(content_file: 'abc.txt')
+  # process_any_content(template: 'abc {{name}}', name: 'sean')
+  # process_any_content(template_file: 'abc.txt', name: 'sean')
+
+  # process_any_content(content_gist:  'https://gist.github.com/klueless-io/8d4b6d199dbe4a5d40807a47fff8ed1c')
+  # process_any_content(template_gist: 'https://gist.github.com/klueless-io/8d4b6d199dbe4a5d40807a47fff8ed1c', name: 'sean')
+
   class BaseBuilder
     include KLog::Logging
 
@@ -134,6 +143,21 @@ module KBuilder
 
     alias touch add_file # it is expected that you would not supply any options, just a file name
 
+    def delete_file(file, **opts)
+      full_file = opts.key?(:folder_key) ? target_file(file, folder: opts[:folder_key]) : target_file(file)
+
+      File.delete(full_file) if File.exist?(full_file)
+
+      self
+    end
+
+    # ToDo
+    # def delete_folder(file)
+    #   FileUtils.remove_dir(path_to_directory) if File.directory?(path_to_directory)
+
+    #   self
+    # end
+
     def make_folder(folder_key = nil, sub_path: nil)
       folder_key  = current_folder_key if folder_key.nil?
       folder      = target_folder(folder_key)
@@ -191,6 +215,20 @@ module KBuilder
 
       self
     end
+
+    def open
+      open_file(last_output_file)
+
+      self
+    end
+    alias o open
+
+    def open_template
+      open_file(last_template_file)
+
+      self
+    end
+    alias ot open_template
 
     def open_file(file)
       if file.nil?
