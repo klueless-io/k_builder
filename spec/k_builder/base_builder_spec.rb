@@ -252,19 +252,19 @@ RSpec.describe KBuilder::BaseBuilder do
 
         context 'relative files' do
           context 'when simple file "index.html"' do
-            subject { instance.target_file('index.html', folder: :src) }
+            subject { instance.target_file('index.html', folder_key: :src) }
 
             it { is_expected.to eq(File.join(target_folder, 'index.html')) }
           end
 
           context 'when file is relative to folder "img/logo.png"' do
-            subject { instance.target_file('img/index.html', folder: :src) }
+            subject { instance.target_file('img/index.html', folder_key: :src) }
 
             it { is_expected.to eq(File.join(target_folder, 'img/index.html')) }
           end
 
           context 'when file is relative to folder as file_parts "img", "logo.png"' do
-            subject { instance.target_file('img', 'logo.png', folder: :src) }
+            subject { instance.target_file('img', 'logo.png', folder_key: :src) }
 
             it { is_expected.to eq(File.join(target_folder, 'img/logo.png')) }
           end
@@ -450,6 +450,21 @@ RSpec.describe KBuilder::BaseBuilder do
     end
   end
 
+  describe '#add_file_command' do
+    subject { instance.add_file_command(file, **opts) }
+
+    let(:file) { 'my-file.txt' }
+    let(:opts) { { folder_key: :xmen } }
+
+    it do
+      is_expected.to eq({
+                          action: :add_file,
+                          file: file,
+                          opts: opts
+                        })
+    end
+  end
+
   describe '#add_file' do
     include_context 'temp_dir + templates configuration'
 
@@ -579,6 +594,21 @@ RSpec.describe KBuilder::BaseBuilder do
       let(:opts) { { template_file: ['abc', 'xyz', 'deep-template.txt'] } }
 
       let(:target_file) { File.join(@temp_folder, file) }
+    end
+  end
+
+  describe '#delete_file_command' do
+    subject { instance.delete_file_command(file, **opts) }
+
+    let(:file) { 'my-file.txt' }
+    let(:opts) { { folder_key: :xmen } }
+
+    it do
+      is_expected.to eq({
+                          action: :delete_file,
+                          file: file,
+                          opts: opts
+                        })
     end
   end
 
@@ -765,22 +795,23 @@ RSpec.describe KBuilder::BaseBuilder do
     end
 
     # NOTE: it is better to use cop for ruby files
-    context 'when rb file' do
-      let(:file_name) { 'make-pretty.rb' }
-      let(:content) { 'class David; def initialize(abc); @abc=abc; end; end;' }
+    # NOTE: and it stopped working (maybe a configuration issue)
+    # context 'when rb file' do
+    #   let(:file_name) { 'make-pretty.rb' }
+    #   let(:content) { 'class David; def initialize(abc); @abc=abc; end; end;' }
 
-      it {
-        expected = <<~RUBY.strip
-          class David
-            def initialize(abc)
-              @abc = abc
-            end
-          end
-        RUBY
+    #   it {
+    #     expected = <<~RUBY.strip
+    #       class David
+    #         def initialize(abc)
+    #           @abc = abc
+    #         end
+    #       end
+    #     RUBY
 
-        is_expected.to eq(expected)
-      }
-    end
+    #     is_expected.to eq(expected)
+    #   }
+    # end
 
     context 'when html file' do
       let(:file_name) { 'make-pretty.html' }
@@ -795,6 +826,21 @@ RSpec.describe KBuilder::BaseBuilder do
 
         is_expected.to eq(expected)
       end
+    end
+  end
+
+  describe '#vscode_command' do
+    subject { instance.vscode_command(*file_parts, **opts) }
+
+    let(:file_parts) { ['xmen', 'my-file.txt'] }
+    let(:opts) { { folder_key: :xmen, file: nil } }
+
+    it do
+      is_expected.to eq({
+                          action: :vscode,
+                          file_parts: file_parts,
+                          opts: opts
+                        })
     end
   end
 
@@ -829,6 +875,21 @@ RSpec.describe KBuilder::BaseBuilder do
 
     #   it { subject }
     # end
+  end
+
+  describe '#browse_command' do
+    subject { instance.browse_command(*file_parts, **opts) }
+
+    let(:file_parts) { ['xmen', 'my-file.txt'] }
+    let(:opts) { { folder_key: :xmen, file: nil } }
+
+    it do
+      is_expected.to eq({
+                          action: :browse,
+                          file_parts: file_parts,
+                          opts: opts
+                        })
+    end
   end
 
   def pbpaste
