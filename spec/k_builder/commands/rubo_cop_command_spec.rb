@@ -170,7 +170,6 @@ RSpec.describe KBuilder::Commands::RuboCopCommand do
     before { setup_sample_file }
     before { instance.execute }
 
-    # fit { binding.pry }
     context 'when no settings provided' do
       context 'file remains unchanged' do
         it { is_expected.to eq(content) }
