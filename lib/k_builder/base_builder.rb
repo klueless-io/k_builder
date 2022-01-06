@@ -121,7 +121,15 @@ module KBuilder
     # Extra options will be used as data for templates, e.g
     # @option opts [String] :to Recipient email
     # @option opts [String] :body The email's body
-    # rubocop:disable Metrics/AbcSize
+    def add_file_command(file, **opts)
+      {
+        action: :add_file,
+        file: file,
+        opts: opts
+      }
+    end
+
+    # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
     def add_file(file, **opts)
       # move to command
       full_file = target_file(file, **opts) # opts.key?(:folder_key) || opts.key?(:folder) ? target_file(file, folder: opts[:folder], folder_key: opts[:folder_key]) : target_file(file)
@@ -146,9 +154,30 @@ module KBuilder
 
       self
     end
-    # rubocop:enable Metrics/AbcSize
+    # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity
+
+    def replay_commands(commands)
+      commands.each do |command|
+        case command[:action]
+        when :add_file
+          add_file(command[:file], command[:opts])
+        when :delete_file
+          delete_file(command[:file], command[:opts])
+        else
+          log.error "Unknown command: #{command[:action]}"
+        end
+      end
+    end
 
     alias touch add_file # it is expected that you would not supply any options, just a file name
+
+    def delete_file_command(file, **opts)
+      {
+        action: :delete_file,
+        file: file,
+        opts: opts
+      }
+    end
 
     def delete_file(file, **opts)
       full_file = target_file(file, **opts) # = opts.key?(:folder_key) ? target_file(file, folder: opts[:folder_key]) : target_file(file)
@@ -212,6 +241,14 @@ module KBuilder
     end
     alias clipboard_copy add_clipboard
 
+    def vscode_command(*file_parts, folder_key: current_folder_key, file: nil)
+      {
+        action: :vscode,
+        file_parts: file_parts,
+        opts: { folder_key: folder_key, file: file }
+      }
+    end
+
     def vscode(*file_parts, folder_key: current_folder_key, file: nil)
       # move to command
       file = target_file(*file_parts, folder_key: folder_key) if file.nil?
@@ -219,6 +256,14 @@ module KBuilder
       rc "code #{file}"
 
       self
+    end
+
+    def browse_command(*file_parts, folder_key: current_folder_key, file: nil)
+      {
+        action: :browse,
+        file_parts: file_parts,
+        opts: { folder_key: folder_key, file: file }
+      }
     end
 
     def browse(*file_parts, folder_key: current_folder_key, file: nil)
