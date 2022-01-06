@@ -5,18 +5,24 @@ module KBuilder
   # Configuration for webpack5/builder
   class << self
     attr_writer :configuration
-  end
 
-  def self.configuration
-    @configuration ||= Configuration.new
-  end
+    def configuration(name = :default)
+      @configuration ||= Hash.new do |h, key|
+        h[key] = KBuilder::Configuration.new
+      end
+      @configuration[name]
+    end
 
-  def self.reset
-    @configuration = Configuration.new
-  end
+    def reset(name = :default)
+      @configuration ||= Hash.new do |h, key|
+        h[key] = KBuilder::Configuration.new
+      end
+      @configuration[name] = KBuilder::Configuration.new
+    end
 
-  def self.configure
-    yield(configuration)
+    def configure(name = :default)
+      yield(configuration(name))
+    end
   end
 
   # Does this class need to move out into k_types?
@@ -48,8 +54,12 @@ module KBuilder
       @template_folders = orig.template_folders.clone
     end
 
-    def debug
-      log.section_heading 'kbuilder base configuration'
+    def debug(heading: 'kbuilder base configuration')
+      log.section_heading 'kbuilder base configuration' if heading
+
+      # TODO: Add name to configuration object
+      # Don't have support for name on the configuration object yet
+      # log.kv 'config name', name
 
       target_folders.debug(title: 'target_folders')
 
