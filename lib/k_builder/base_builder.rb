@@ -330,7 +330,7 @@ module KBuilder
     def target_file(*file_parts, folder_key: current_folder_key, folder: nil, **)
       # TODO: Mismatch (sometimes called folder, sometimes called folder_key:)
       if folder
-        log.error("Change folder: to folder_key: for #{folder} - #{file_parts}") 
+        log.error("Change folder: to folder_key: for #{folder} - #{file_parts}")
         return
       end
 
