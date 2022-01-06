@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 module KBuilder
+  # TODO: Why is this called BaseBuilder, why not just builder
+  # TODO: Is this really the builder pattern, it could be the class used by a director
+  #       but it is not really storing information for builder purposes.
+  #
   # Base builder defines builder methods, build method and configuration
   #
   # Convention: Setter methods (are Fluent) and use the prefix set_
@@ -120,7 +124,7 @@ module KBuilder
     # rubocop:disable Metrics/AbcSize
     def add_file(file, **opts)
       # move to command
-      full_file = opts.key?(:folder_key) ? target_file(file, folder: opts[:folder_key]) : target_file(file)
+      full_file = target_file(file, **opts) # opts.key?(:folder_key) || opts.key?(:folder) ? target_file(file, folder: opts[:folder], folder_key: opts[:folder_key]) : target_file(file)
 
       # Need logging options that can log these internal details
       mkdir_p(File.dirname(full_file))
@@ -131,6 +135,9 @@ module KBuilder
 
       # Prettier needs to work with the original file name
       run_prettier file                   if opts.key?(:pretty)
+      # TODO: Add test
+      run_cop(full_file, fix_safe: true)  if opts.key?(:cop) || opts.key?(:ruby_cop)
+
       # Need support for rubocop -a
       open_file(last_output_file)         if opts.key?(:open)
       open_file(last_template_file)       if opts.key?(:open_template)
@@ -144,11 +151,18 @@ module KBuilder
     alias touch add_file # it is expected that you would not supply any options, just a file name
 
     def delete_file(file, **opts)
-      full_file = opts.key?(:folder_key) ? target_file(file, folder: opts[:folder_key]) : target_file(file)
+      full_file = target_file(file, **opts) # = opts.key?(:folder_key) ? target_file(file, folder: opts[:folder_key]) : target_file(file)
 
       File.delete(full_file) if File.exist?(full_file)
 
       self
+    end
+
+    def file_exist?(file, **opts)
+      # full_file = opts.key?(:folder_key) ? target_file(file, folder_key: opts[:folder_key]) : target_file(file)
+      full_file = target_file(file, **opts)
+
+      File.exist?(full_file)
     end
 
     # ToDo
@@ -198,18 +212,18 @@ module KBuilder
     end
     alias clipboard_copy add_clipboard
 
-    def vscode(*file_parts, folder: current_folder_key, file: nil)
+    def vscode(*file_parts, folder_key: current_folder_key, file: nil)
       # move to command
-      file = target_file(*file_parts, folder: folder) if file.nil?
+      file = target_file(*file_parts, folder_key: folder_key) if file.nil?
 
       rc "code #{file}"
 
       self
     end
 
-    def browse(*file_parts, folder: current_folder_key, file: nil)
+    def browse(*file_parts, folder_key: current_folder_key, file: nil)
       # move to command
-      file = target_file(*file_parts, folder: folder) if file.nil?
+      file = target_file(*file_parts, folder_key: folder_key) if file.nil?
 
       rc "open -a \"Google Chrome\" #{file}"
 
@@ -313,12 +327,18 @@ module KBuilder
     #   target_file('/abc.txt')
     #   target_file('/xyz/abc.txt')
     #   target_file('/xyz', 'abc.txt')
-    def target_file(*file_parts, folder: current_folder_key)
+    def target_file(*file_parts, folder_key: current_folder_key, folder: nil, **)
+      # TODO: Mismatch (sometimes called folder, sometimes called folder_key:)
+      if folder
+        log.error("Change folder: to folder_key: for #{folder} - #{file_parts}") 
+        return
+      end
+
       # Absolute path
       return File.join(*file_parts) if Pathname.new(file_parts.first).absolute?
 
-      # Relative to :folder
-      File.join(target_folder(folder), *file_parts)
+      # Relative to :folder_key
+      File.join(target_folder(folder_key), *file_parts)
     end
 
     # Template folder & Files
