@@ -121,9 +121,10 @@ module KBuilder
     # Extra options will be used as data for templates, e.g
     # @option opts [String] :to Recipient email
     # @option opts [String] :body The email's body
-    def add_file_command(file, **opts)
+    def add_file_action(file, **opts)
       {
         action: :add_file,
+        played: false,
         file: file,
         opts: opts
       }
@@ -156,24 +157,39 @@ module KBuilder
     end
     # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity
 
-    def replay_commands(commands)
-      commands.each do |command|
-        case command[:action]
-        when :add_file
-          add_file(command[:file], command[:opts])
-        when :delete_file
-          delete_file(command[:file], command[:opts])
-        else
-          log.error "Unknown command: #{command[:action]}"
-        end
+    def play_actions(actions)
+      actions.reject { |action| action[:played] }.each do |action|
+        play_action(action)
       end
+    end
+
+    def play_action(action)
+      case action[:action]
+      when :add_file
+        add_file(action[:file], action[:opts])
+      when :delete_file
+        delete_file(action[:file], action[:opts])
+      when :vscode
+        vscode(action[:file_parts], action[:opts])
+      when :browse
+        browse(action[:file_parts], action[:opts])
+      when :set_current_folder
+        set_current_folder(action[:folder_key])
+      when :run_command
+        run_command(action[:command])
+      else
+        log.error "Unknown action: #{action[:action]}"
+      end
+
+      action[:played] = true
     end
 
     alias touch add_file # it is expected that you would not supply any options, just a file name
 
-    def delete_file_command(file, **opts)
+    def delete_file_action(file, **opts)
       {
         action: :delete_file,
+        played: false,
         file: file,
         opts: opts
       }
@@ -241,9 +257,10 @@ module KBuilder
     end
     alias clipboard_copy add_clipboard
 
-    def vscode_command(*file_parts, folder_key: current_folder_key, file: nil)
+    def vscode_action(*file_parts, folder_key: current_folder_key, file: nil)
       {
         action: :vscode,
+        played: false,
         file_parts: file_parts,
         opts: { folder_key: folder_key, file: file }
       }
@@ -258,9 +275,10 @@ module KBuilder
       self
     end
 
-    def browse_command(*file_parts, folder_key: current_folder_key, file: nil)
+    def browse_action(*file_parts, folder_key: current_folder_key, file: nil)
       {
         action: :browse,
+        played: false,
         file_parts: file_parts,
         opts: { folder_key: folder_key, file: file }
       }
@@ -329,6 +347,14 @@ module KBuilder
 
     # Target folders and files
     # ----------------------------------------------------------------------
+
+    def set_current_folder_action(folder_key)
+      {
+        action: :set_current_folder,
+        played: false,
+        folder_key: folder_key
+      }
+    end
 
     def set_current_folder(folder_key)
       target_folders.current = folder_key
@@ -505,6 +531,14 @@ module KBuilder
       system(build_command)
     end
     alias rc run_command
+
+    def run_command_action(command)
+      {
+        action: :run_command,
+        played: false,
+        command: command
+      }
+    end
 
     def file_write(file, content, on_exist: :skip)
       self.last_output_file = file # if file not found, we still want to record this as the last_output_file
