@@ -156,6 +156,21 @@ RSpec.describe KBuilder::BaseBuilder do
     end
   end
 
+  describe '#set_current_folder' do
+    subject { instance.set_current_folder_action(folder_key) }
+
+    let(:file) { 'my-file.txt' }
+    let(:folder_key) { :xmen }
+
+    it do
+      is_expected.to eq({
+                          action: :set_current_folder,
+                          folder_key: folder_key,
+                          played: false
+                        })
+    end
+  end
+
   describe '#set_current_folder (alias: cd)' do
     include_context 'complete configuration'
 
@@ -450,8 +465,8 @@ RSpec.describe KBuilder::BaseBuilder do
     end
   end
 
-  describe '#add_file_command' do
-    subject { instance.add_file_command(file, **opts) }
+  describe '#add_file_action' do
+    subject { instance.add_file_action(file, **opts) }
 
     let(:file) { 'my-file.txt' }
     let(:opts) { { folder_key: :xmen } }
@@ -460,7 +475,8 @@ RSpec.describe KBuilder::BaseBuilder do
       is_expected.to eq({
                           action: :add_file,
                           file: file,
-                          opts: opts
+                          opts: opts,
+                          played: false
                         })
     end
   end
@@ -597,8 +613,8 @@ RSpec.describe KBuilder::BaseBuilder do
     end
   end
 
-  describe '#delete_file_command' do
-    subject { instance.delete_file_command(file, **opts) }
+  describe '#delete_file_action' do
+    subject { instance.delete_file_action(file, **opts) }
 
     let(:file) { 'my-file.txt' }
     let(:opts) { { folder_key: :xmen } }
@@ -607,7 +623,8 @@ RSpec.describe KBuilder::BaseBuilder do
       is_expected.to eq({
                           action: :delete_file,
                           file: file,
-                          opts: opts
+                          opts: opts,
+                          played: false
                         })
     end
   end
@@ -829,8 +846,22 @@ RSpec.describe KBuilder::BaseBuilder do
     end
   end
 
-  describe '#vscode_command' do
-    subject { instance.vscode_command(*file_parts, **opts) }
+  describe '#run_command_action' do
+    subject { instance.run_command_action(command) }
+
+    let(:command) { "echo 'hello'" }
+
+    it do
+      is_expected.to eq({
+                          action: :run_command,
+                          command: command,
+                          played: false
+                        })
+    end
+  end
+
+  describe '#vscode_action' do
+    subject { instance.vscode_action(*file_parts, **opts) }
 
     let(:file_parts) { ['xmen', 'my-file.txt'] }
     let(:opts) { { folder_key: :xmen, file: nil } }
@@ -839,7 +870,8 @@ RSpec.describe KBuilder::BaseBuilder do
       is_expected.to eq({
                           action: :vscode,
                           file_parts: file_parts,
-                          opts: opts
+                          opts: opts,
+                          played: false
                         })
     end
   end
@@ -877,8 +909,8 @@ RSpec.describe KBuilder::BaseBuilder do
     # end
   end
 
-  describe '#browse_command' do
-    subject { instance.browse_command(*file_parts, **opts) }
+  describe '#browse_action' do
+    subject { instance.browse_action(*file_parts, **opts) }
 
     let(:file_parts) { ['xmen', 'my-file.txt'] }
     let(:opts) { { folder_key: :xmen, file: nil } }
@@ -887,7 +919,8 @@ RSpec.describe KBuilder::BaseBuilder do
       is_expected.to eq({
                           action: :browse,
                           file_parts: file_parts,
-                          opts: opts
+                          opts: opts,
+                          played: false
                         })
     end
   end
