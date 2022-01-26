@@ -146,6 +146,8 @@ module KBuilder
       run_prettier file                   if opts.key?(:pretty)
       # TODO: Add test
       run_cop(full_file, fix_safe: true)  if opts.key?(:cop) || opts.key?(:ruby_cop)
+      # TODO: Add test
+      run_command(file)                   if opts.key?(:run)
 
       # Need support for rubocop -a
       open_file(last_output_file)         if opts.key?(:open)
@@ -164,6 +166,12 @@ module KBuilder
     end
 
     def play_action(action)
+      run_action(action)
+      action[:played] = true
+    end
+
+    # certain actions (e.g. set_current_folder) will run independently to play
+    def run_action(action)
       case action[:action]
       when :add_file
         add_file(action[:file], action[:opts])
@@ -177,11 +185,11 @@ module KBuilder
         set_current_folder(action[:folder_key])
       when :run_command
         run_command(action[:command])
+      when :run_script
+        run_script(action[:script])
       else
         log.error "Unknown action: #{action[:action]}"
       end
-
-      action[:played] = true
     end
 
     alias touch add_file # it is expected that you would not supply any options, just a file name
@@ -529,6 +537,11 @@ module KBuilder
       # need to support the fork process options as I was not able to run
       # k_builder_watch -n because it hid all the following output
       system(build_command)
+
+      # FROM k_dsl
+      # system "/usr/local/bin/zsh #{output_file}" if execution_context == :system
+      # fork { exec("/usr/local/bin/zsh #{output_file}") } if execution_context == :fork
+
     end
     alias rc run_command
 
@@ -537,6 +550,34 @@ module KBuilder
         action: :run_command,
         played: false,
         command: command
+      }
+    end
+
+    # NOT TESTED, and not working with opts, this code needs rewrite
+    def run_script(script)
+      # Deep path create if needed
+      tf = target_folder
+
+      mkdir_p(tf)
+
+      Dir.chdir(tf) do
+        output, status = Open3.capture2(script) # , **opts)
+  
+        unless status.success?
+          log.error("Script failed") 
+          puts script
+          return nil
+        end
+        
+        return output
+      end
+    end
+
+    def run_script_action(script)
+      {
+        action: :run_script,
+        played: false,
+        script: script
       }
     end
 
