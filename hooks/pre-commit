@@ -8,8 +8,8 @@ require 'English'
 
 exit 0 if ARGV.include?('--no-verify')
 
-warning_keywords = %w[console.log]
-keywords = %w[binding.pry console.dir byebug debugger]
+warning_keywords = %w[]
+keywords = %w[binding.pry console.dir byebug]
 files_changed = `git diff-index --name-only HEAD --`.split
 
 # puts '----------------------------------------------------------------------'
