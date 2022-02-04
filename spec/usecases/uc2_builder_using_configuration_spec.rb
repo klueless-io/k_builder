@@ -6,7 +6,7 @@ RSpec.describe 'Usecases::BuilderUsingConfiguration' do
   before :each do
     usecases_folder = File.join(Dir.getwd, 'spec', 'usecases')
 
-    KBuilder.configure do |config|
+    KConfig.configure do |config|
       config.target_folders.add(:app, File.join(usecases_folder, '.output'))
 
       config.template_folders.add(:global , File.join(usecases_folder, '.global_template'))
@@ -15,7 +15,7 @@ RSpec.describe 'Usecases::BuilderUsingConfiguration' do
   end
 
   after :each do
-    KBuilder.reset
+    KConfig.reset
   end
 
   describe 'builder' do
@@ -26,7 +26,7 @@ RSpec.describe 'Usecases::BuilderUsingConfiguration' do
         Configured Output Folder          : {{c}}
       TEXT
 
-      builder = KBuilder::BaseBuilder.init
+      builder = KConfig::BaseBuilder.init
 
       builder
         .add_file('main.rb', template_file: 'class.rb', name: 'main')
