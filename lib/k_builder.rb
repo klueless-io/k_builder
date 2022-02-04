@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'rubocop'
-require "open3"
+require 'open3'
 
 require 'k_log'
 require 'k_util'
