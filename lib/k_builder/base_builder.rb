@@ -54,7 +54,7 @@ module KBuilder
 
     # assigns a builder hash and defines builder methods
     def initialize(configuration = nil)
-      configuration = KBuilder.configuration if configuration.nil?
+      configuration = KConfig.configuration if configuration.nil?
 
       @configuration = configuration
 

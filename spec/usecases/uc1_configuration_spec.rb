@@ -6,7 +6,7 @@ RSpec.describe 'Usecases::Configuration' do
   before :each do
     usecases_folder = File.join(Dir.getwd, 'spec', 'usecases')
 
-    KBuilder.configure do |config|
+    KConfig.configure do |config|
       config.target_folders.add(:app, File.join(usecases_folder, '.output'))
 
       config.template_folders.add(:global , File.join(usecases_folder, '.global_template'))
@@ -15,11 +15,11 @@ RSpec.describe 'Usecases::Configuration' do
   end
 
   after :each do
-    KBuilder.reset
+    KConfig.reset
   end
 
   describe 'print configuration' do
-    subject { KBuilder.configuration.to_h }
+    subject { KConfig.configuration.to_h }
 
     it do
       puts JSON.pretty_generate(subject)

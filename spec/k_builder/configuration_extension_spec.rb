@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-RSpec.describe KBuilder::Configuration do
-  let(:builder_module) { KBuilder }
+RSpec.describe KBuilder::ConfigurationExtension do
+  let(:k_config) { KConfig }
   let(:cfg) { ->(config) {} }
-  let(:instance) { builder_module.configuration }
+  let(:instance) { k_config.configuration }
 
   let(:custom_target_folder1) { '~/my-target-folder1' }
   let(:custom_target_folder2) { '~/my-target-folder2' }
@@ -53,16 +53,16 @@ RSpec.describe KBuilder::Configuration do
 
   describe 'when using default configuration' do
     before :each do
-      builder_module.configure(&cfg)
+      k_config.configure(&cfg)
     end
     after :each do
-      builder_module.reset
+      k_config.reset
     end
 
     context 'debug' do
       include_context 'target + template configuration'
 
-      it { builder_module.configuration.debug }
+      it { k_config.configuration.debug }
     end
 
     describe '.target_folders' do
@@ -284,25 +284,25 @@ RSpec.describe KBuilder::Configuration do
 
   describe 'when using configuration channels' do
     # before :each do
-    #   builder_module.configure(&cfg)
+    #   k_config.configure(&cfg)
     # end
     # after :each do
-    #   builder_module.reset
+    #   k_config.reset
     # end
 
     context 'when two channels' do
-      let(:instance) { builder_module.configuration(channel) }
+      let(:instance) { k_config.configuration(channel) }
 
       before do
-        builder_module.reset(:microapp)
-        builder_module.reset(:data)
+        k_config.reset(:microapp)
+        k_config.reset(:data)
 
-        builder_module.configure(:microapp) do |config|
+        k_config.configure(:microapp) do |config|
           config.template_folders.add(:microapp, '~/dev/definitions/microapp')
           config.target_folders.add(:root, '~/dev/some_app')
         end
 
-        builder_module.configure(:data) do |config|
+        k_config.configure(:data) do |config|
           config.target_folders.add(:root, '~/dev/some_data')
         end
       end

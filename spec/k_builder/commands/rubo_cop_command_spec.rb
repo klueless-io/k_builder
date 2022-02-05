@@ -8,7 +8,7 @@ RSpec.describe KBuilder::Commands::RuboCopCommand do
 
   # Builder setup (dependency)
   let(:builder)           { KBuilder::BaseBuilder.init }
-  let(:builder_module)    { KBuilder }
+  let(:k_config)          { KConfig }
   let(:cfg)               { ->(config) {} }
 
   # Input parameter (dependencies)
@@ -19,10 +19,10 @@ RSpec.describe KBuilder::Commands::RuboCopCommand do
   let(:setup_sample_file) { builder.add_file(file_name, content: content) } # File.write(target_file, content) }
 
   before :each do
-    builder_module.configure(&cfg)
+    k_config.configure(&cfg)
   end
   after :each do
-    builder_module.reset
+    k_config.reset
   end
 
   shared_context :temp_dir do
