@@ -3,13 +3,13 @@
 require 'rubocop'
 require 'open3'
 
+require 'k_config'
 require 'k_log'
 require 'k_util'
 require 'k_type'
 require 'k_builder/version'
 require 'k_builder/base_builder'
-require 'k_builder/base_configuration'
-require 'k_builder/configuration'
+require 'k_builder/configuration_extension'
 require 'k_builder/file_segments'
 
 # should commands be in their own gem?

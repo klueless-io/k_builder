@@ -38,6 +38,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
   # spec.extensions    = ['ext/k_builder/extconf.rb']
   spec.add_dependency 'handlebars-helpers', '~> 0'
+  spec.add_dependency 'k_config', '~> 0'
   spec.add_dependency 'k_log', '~> 0'
   spec.add_dependency 'k_type', '~> 0'
   spec.add_dependency 'k_util', '~> 0'
@@ -45,4 +46,5 @@ Gem::Specification.new do |spec|
 
   # spec.add_dependency "anyway_config"     , ">= 2.0.0"
   # spec.add_dependency "config"     , ">= 3.0.0"
+  spec.metadata['rubygems_mfa_required'] = 'true'
 end
