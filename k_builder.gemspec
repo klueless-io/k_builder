@@ -44,7 +44,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'k_util', '~> 0'
   spec.add_dependency 'rubocop', '~> 1.8'
 
-  # spec.add_dependency "anyway_config"     , ">= 2.0.0"
-  # spec.add_dependency "config"     , ">= 3.0.0"
   spec.metadata['rubygems_mfa_required'] = 'true'
 end
