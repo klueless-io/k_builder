@@ -32,7 +32,7 @@ module KBuilder
       ''
     end
 
-    # Custom initialize_copy method for k_builder. This is called during clone
+    # Custom initialize_copy method for k_builder, this is called during clone
     def k_builder_initialize_copy(orig)
       @target_folders = orig.target_folders.clone
       @template_folders = orig.template_folders.clone
