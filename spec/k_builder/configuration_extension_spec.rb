@@ -62,7 +62,7 @@ RSpec.describe KBuilder::ConfigurationExtension do
     context 'debug' do
       include_context 'target + template configuration'
 
-      it { k_config.configuration.debug(:k_builder_debug) }
+      it { k_config.configuration.debug }
     end
 
     describe '.target_folders' do

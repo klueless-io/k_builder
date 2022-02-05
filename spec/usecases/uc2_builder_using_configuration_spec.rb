@@ -26,7 +26,7 @@ RSpec.describe 'Usecases::BuilderUsingConfiguration' do
         Configured Output Folder          : {{c}}
       TEXT
 
-      builder = KConfig::BaseBuilder.init
+      builder = KBuilder::BaseBuilder.init
 
       builder
         .add_file('main.rb', template_file: 'class.rb', name: 'main')

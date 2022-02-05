@@ -7,17 +7,17 @@ RSpec.describe KBuilder::Commands::CodeSyntaxHighlighterCommand do
 
   # Builder setup (dependency)
   let(:builder)           { KBuilder::BaseBuilder.init }
-  let(:builder_module)    { KBuilder }
+  let(:k_config)          { KConfig }
   let(:cfg)               { ->(config) {} }
 
   # Input parameter (dependencies)
   let(:source_code)       { "class David\ndef initialize(abc,xyz); @abc=abc; end\nend" }
 
   before :each do
-    builder_module.configure(&cfg)
+    k_config.configure(&cfg)
   end
   after :each do
-    builder_module.reset
+    k_config.reset
   end
 
   # shared_context :temp_dir do

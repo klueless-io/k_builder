@@ -31,7 +31,13 @@ module KBuilder
       template_folders.debug(title: 'template folders (search order)')
       ''
     end
+
+    # Custom initialize_copy method for k_builder. This is called during clone
+    def k_builder_initialize_copy(orig)
+      @target_folders = orig.target_folders.clone
+      @template_folders = orig.template_folders.clone
+    end
   end
 end
 
-KConfig::Configuration.include(KBuilder::ConfigurationExtension)
+KConfig::Configuration.register(:k_builder, KBuilder::ConfigurationExtension)

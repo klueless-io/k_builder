@@ -2,7 +2,7 @@
 
 RSpec.describe KBuilder::BaseBuilder do
   let(:instance) { described_class.init }
-  let(:builder_module) { KBuilder }
+  let(:k_config) { KConfig }
   let(:cfg) { ->(config) {} }
 
   let(:sample_assets_folder) { File.join(Dir.getwd, 'spec', 'sample-assets') }
@@ -16,10 +16,10 @@ RSpec.describe KBuilder::BaseBuilder do
   let(:global_template_folder) { File.join(sample_assets_folder, 'global-template') }
 
   before :each do
-    builder_module.configure(&cfg)
+    k_config.configure(&cfg)
   end
   after :each do
-    builder_module.reset
+    k_config.reset
   end
 
   shared_context 'temp_dir' do
