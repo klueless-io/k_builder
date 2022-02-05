@@ -130,7 +130,7 @@ module KBuilder
       }
     end
 
-    # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
     def add_file(file, **opts)
       # move to command
       full_file = target_file(file, **opts) # opts.key?(:folder_key) || opts.key?(:folder) ? target_file(file, folder: opts[:folder], folder_key: opts[:folder_key]) : target_file(file)
@@ -157,7 +157,7 @@ module KBuilder
 
       self
     end
-    # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 
     def play_actions(actions)
       actions.reject { |action| action[:played] }.each do |action|
@@ -171,6 +171,7 @@ module KBuilder
     end
 
     # certain actions (e.g. set_current_folder) will run independently to play
+    # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
     def run_action(action)
       case action[:action]
       when :add_file
@@ -191,6 +192,7 @@ module KBuilder
         log.error "Unknown action: #{action[:action]}"
       end
     end
+    # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity
 
     alias touch add_file # it is expected that you would not supply any options, just a file name
 
@@ -541,7 +543,6 @@ module KBuilder
       # FROM k_dsl
       # system "/usr/local/bin/zsh #{output_file}" if execution_context == :system
       # fork { exec("/usr/local/bin/zsh #{output_file}") } if execution_context == :fork
-
     end
     alias rc run_command
 
@@ -562,13 +563,13 @@ module KBuilder
 
       Dir.chdir(tf) do
         output, status = Open3.capture2(script) # , **opts)
-  
+
         unless status.success?
-          log.error("Script failed") 
+          log.error('Script failed')
           puts script
           return nil
         end
-        
+
         return output
       end
     end
