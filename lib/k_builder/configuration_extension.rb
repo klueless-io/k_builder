@@ -40,4 +40,5 @@ module KBuilder
   end
 end
 
+puts 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
 KConfig::Configuration.register(:k_builder, KBuilder::ConfigurationExtension)
