@@ -175,9 +175,11 @@ module KBuilder
     def run_action(action)
       case action[:action]
       when :add_file
-        add_file(action[:file], action[:opts])
+        add_file(action[:file], **action[:opts])
       when :delete_file
         delete_file(action[:file], action[:opts])
+      when :add_clipboard
+        add_clipboard(action[:opts])
       when :vscode
         vscode(action[:file_parts], action[:opts])
       when :browse
@@ -266,6 +268,14 @@ module KBuilder
       self
     end
     alias clipboard_copy add_clipboard
+
+    def add_clipboard_action(**opts)
+      {
+        action: :add_clipboard,
+        played: false,
+        opts: opts
+      }
+    end
 
     def vscode_action(*file_parts, folder_key: current_folder_key, file: nil)
       {
