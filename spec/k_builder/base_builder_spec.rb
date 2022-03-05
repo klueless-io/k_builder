@@ -653,7 +653,7 @@ RSpec.describe KBuilder::BaseBuilder do
   describe '#add_clipboard_action' do
     subject { instance.add_clipboard_action(**opts) }
 
-    let(:opts) { { template_file: 'xyz' } }
+    let(:opts) { { template_file: 'abc' } }
 
     it do
       is_expected.to eq({
