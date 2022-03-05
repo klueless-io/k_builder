@@ -650,6 +650,20 @@ RSpec.describe KBuilder::BaseBuilder do
     end
   end
 
+  describe '#add_clipboard_action' do
+    subject { instance.add_clipboard_action(**opts) }
+
+    let(:opts) { { template_file: 'xyz' } }
+
+    it do
+      is_expected.to eq({
+                          action: :add_clipboard,
+                          opts: opts,
+                          played: false
+                        })
+    end
+  end
+
   # describe '#add_clipboard (not supported in CI)' do
   #   include_context 'complete configuration'
 
