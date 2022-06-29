@@ -210,7 +210,7 @@ module KBuilder
     def delete_file(file, **opts)
       full_file = target_file(file, **opts) # = opts.key?(:folder_key) ? target_file(file, folder: opts[:folder_key]) : target_file(file)
 
-      File.delete(full_file) if File.exist?(full_file)
+      FileUtils.rm_rf(full_file)
 
       self
     end
