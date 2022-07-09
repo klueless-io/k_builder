@@ -520,6 +520,13 @@ module KBuilder
       Handlebars::Helpers::Template.render(template_content, opts) unless template_content.nil?
     end
 
+    # Usage
+    #
+    # @example
+    #
+    # Dir.chdir(k_builder.target_folders.get(:app)) do
+    #   k_builder.run_cop('**/*.rb', fix_unsafe: true)
+    # end
     def run_cop(file, **opts)
       command = Commands::RuboCopCommand.new(file, builder: self, **opts)
       command.execute
