@@ -517,7 +517,8 @@ module KBuilder
 
       template_content = use_template(**opts)
 
-      Handlebars::Helpers::Template.render(template_content, opts) unless template_content.nil?
+      Handlebarsjs.render(template_content, opts) unless template_content.nil?
+      # Handlebars::Helpers::Template.render(template_content, opts) unless template_content.nil?
     end
 
     # Usage

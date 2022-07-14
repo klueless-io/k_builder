@@ -17,7 +17,8 @@ require 'k_builder/commands/base_command'
 require 'k_builder/commands/rubo_cop_command'
 require 'k_builder/commands/code_syntax_highlighter_command'
 
-require 'handlebars/helpers/template'
+require 'handlebarsjs'
+# require 'handlebars/helpers/template'
 
 module KBuilder
   # raise KBuilder::Error, 'Sample message'
