@@ -788,7 +788,7 @@ RSpec.describe KBuilder::BaseBuilder do
     before do
       instance
         .add_file(file_name, content: content)
-        .run_prettier(file_name, log_level: :silent)
+        .run_prettier(file_name, log_level: :debug)
     end
 
     let(:target_file) { File.join(@temp_folder, file_name) }

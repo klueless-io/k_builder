@@ -11,7 +11,13 @@ RSpec.describe 'Usecases::BuilderUsingConfiguration' do
 
       config.template_folders.add(:global , File.join(usecases_folder, '.global_template'))
       config.template_folders.add(:app , File.join(usecases_folder, '.app_template'))
+
+      # Ensure that camel case helper is configured
+      config.handlebars.defaults.add_case_defaults
     end
+
+    # Configuration is altered so need to reset the handlebars singleton
+    Handlebarsjs.reset    
   end
 
   after :each do

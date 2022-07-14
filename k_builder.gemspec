@@ -22,9 +22,10 @@ Gem::Specification.new do |spec|
 
   # spec.metadata['allowed_push_host'] = "Set to 'http://mygemserver.com'"
 
-  spec.metadata['homepage_uri'] = spec.homepage
-  spec.metadata['source_code_uri'] = 'https://github.com/klueless-io/k_builder'
-  spec.metadata['changelog_uri'] = 'https://github.com/klueless-io/k_builder/commits/master'
+  spec.metadata['homepage_uri']           = spec.homepage
+  spec.metadata['source_code_uri']        = 'https://github.com/klueless-io/k_builder'
+  spec.metadata['changelog_uri']          = 'https://github.com/klueless-io/k_builder/commits/master'
+  spec.metadata['rubygems_mfa_required']  = 'true'
 
   # Specify which files should be added to the gem when it is released.
   # The `git ls-files -z` loads the RubyGem files that have been added into git.
@@ -37,12 +38,11 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
   # spec.extensions    = ['ext/k_builder/extconf.rb']
-  spec.add_dependency 'handlebars-helpers', '~> 0'
+  # spec.add_dependency 'handlebars-helpers', '~> 0'
+  spec.add_dependency 'handlebarsjs', '~> 0.6'
   spec.add_dependency 'k_config', '~> 0'
   spec.add_dependency 'k_log', '~> 0'
   spec.add_dependency 'k_type', '~> 0'
   spec.add_dependency 'k_util', '~> 0'
   spec.add_dependency 'rubocop', '~> 1.8'
-
-  spec.metadata['rubygems_mfa_required'] = 'true'
 end
