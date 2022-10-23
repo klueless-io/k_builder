@@ -17,7 +17,7 @@ RSpec.describe 'Usecases::BuilderUsingConfiguration' do
     end
 
     # Configuration is altered so need to reset the handlebars singleton
-    Handlebarsjs.reset    
+    Handlebarsjs.reset
   end
 
   after :each do

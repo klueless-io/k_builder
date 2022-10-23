@@ -13,12 +13,12 @@ require 'k_builder'
 #   config_file = File.join(Gem.loaded_specs['handlebars-helpers'].full_gem_path, '.handlebars_helpers.json')
 #   config.helper_config_file = config_file
 # end
-handlebarsjs_folder = Gem::Specification.find_by_name('handlebarsjs').gem_dir
+# handlebarsjs_folder = Gem::Specification.find_by_name('handlebarsjs').gem_dir
 
-require_relative "#{handlebarsjs_folder}/lib/handlebarsjs/helpers/array/default_configuration"
-require_relative "#{handlebarsjs_folder}/lib/handlebarsjs/helpers/case/default_configuration"
-require_relative "#{handlebarsjs_folder}/lib/handlebarsjs/helpers/comparison/default_configuration"
-require_relative "#{handlebarsjs_folder}/lib/handlebarsjs/helpers/inflection/default_configuration"
+# require_relative "#{handlebarsjs_folder}/lib/handlebarsjs/helpers/array/default_configuration"
+# require_relative "#{handlebarsjs_folder}/lib/handlebarsjs/helpers/case/default_configuration"
+# require_relative "#{handlebarsjs_folder}/lib/handlebarsjs/helpers/comparison/default_configuration"
+# require_relative "#{handlebarsjs_folder}/lib/handlebarsjs/helpers/inflection/default_configuration"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
