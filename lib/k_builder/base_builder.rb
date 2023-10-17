@@ -159,6 +159,15 @@ module KBuilder
     end
     # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 
+    def copy_file_action(file, **opts)
+      {
+        action: :add_file,
+        played: false,
+        file: file,
+        opts: opts
+      }
+    end
+
     def play_actions(actions)
       actions.reject { |action| action[:played] }.each do |action|
         play_action(action)

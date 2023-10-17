@@ -31,9 +31,11 @@ k_builder.yml
 *.a
 mkmf.log
 
+.DS_Store
+
 # Ruby Version
 .ruby-version
-
+.tool-versions
 # Environment File
 .env
 
